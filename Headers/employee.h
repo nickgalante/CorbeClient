@@ -2,7 +2,7 @@
 #define Employee_H
 
 #include <map>
-#include <string>
+#include <QObject>
 
 using namespace std;
 
@@ -10,15 +10,15 @@ class Employee
 {
 
 public:
-    string first_name;
-    string last_name;
-    string Employee_id;
-    map<string, string> file_map;
+    QString first_name;
+    QString last_name;
+    QString Employee_id;
+    map<QString, QString> file_map;
 
     Employee();
-    void addFile( string, string );
-    int getFileFromServer(string);
-    void upLoadFileToServer(string);
+    void addFile( QString, QString );
+    int getFileFromServer(QString);
+    void upLoadFileToServer(QString);
 };
 
 #endif // Employee_H

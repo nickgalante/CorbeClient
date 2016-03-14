@@ -1,10 +1,11 @@
 #include "serverinterface.h"
 
-
+#include <iostream>
 #include <fstream>
 #include <QFile>
 
-bool ServerInterface::getFile(string userid, string filename) {
+//not tested, probably will fail
+bool ServerInterface::getFile(QString userid, QString filename) {
 
     QNetworkAccessManager manager;
     QNetworkRequest req(QUrl("http://localhost:8080/returnFile"));
@@ -18,7 +19,25 @@ bool ServerInterface::getFile(string userid, string filename) {
     return true;
 }
 
-/*int ServerInterface::postFile(string userid, string filename, string filelocation) {
+void ServerInterface::handleLogin(QString email, QString password){
+
+    QNetworkAccessManager *manager = new QNetworkAccessManager();
+
+    QUrl url("http://localhost:8080/signin");
+    QNetworkRequest request(url);
+
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
+
+    QByteArray postData;
+    postData.append("email=" + email);
+    postData.append("&md5Password=" +  password);
+
+    manager->post(request, postData);
+
+}
+
+
+/*int ServerInterface::postFile(QString userid, QString filename, QString filelocation) {
 
 	// load file into memory from here
 

@@ -9,7 +9,7 @@ Employee::Employee()
     this->Employee_id = "ENG0000000000000001";
 }
 
-void Employee::addFile(string file_name, string fileLocation){
+void Employee::addFile(QString file_name, QString fileLocation){
     file_map[file_name] = fileLocation;
 }
 
@@ -18,7 +18,7 @@ void Employee::addFile(string file_name, string fileLocation){
     ServerInterface::postFile(Employee_id, file_name, file_location);
 }*/
 
-int Employee::getFileFromServer(string file_name){
+int Employee::getFileFromServer(QString file_name){
     ServerInterface::getFile(Employee_id, file_name);
     return 0;
 }
