@@ -6,7 +6,7 @@ LoginWindow::LoginWindow(QWidget *parent) : QDialog(parent), ui(new Ui::LoginWin
 {
     ui->setupUi(this);
     QObject::connect(ui->loginButton, SIGNAL(clicked()), this, SLOT(handleLogin()));
-    QObject::connect(ui->cancelButton, SIGNAL(clicked()), this, SLOT(handleCancel()));
+    QObject::connect(ui->cancelButton, SIGNAL(clicked()), this, SLOT(cancelLogin()));
 }
 
 LoginWindow::~LoginWindow()
@@ -19,9 +19,11 @@ void LoginWindow::handleLogin()
     QString enteredEmail = ui->email->toPlainText();
     QString enterPassword = ui->password->toPlainText();
     ServerInterface::handleLogin(enteredEmail, enterPassword);
-}
-
-void LoginWindow::cancelLogin()
-{
+    this->accept();
 
 }
+
+void LoginWindow::cancelLogin(){
+    this->reject();
+}
+

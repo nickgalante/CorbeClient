@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 
+#include "loginwindow.h"
+
 namespace Ui {
 class MainWindow;
 }
@@ -14,6 +16,9 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget* parent = 0);
     ~MainWindow();
+
+private slots:
+    void handlePushButton();
 
 private:
     Ui::MainWindow *ui;
