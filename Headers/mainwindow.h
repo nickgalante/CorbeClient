@@ -21,11 +21,15 @@ public:
 
 private slots:
      void handleLogin();
-     void replyFinished(QNetworkReply*);
+     //void replyFinished(QNetworkReply*);
+     void requestReceived(QNetworkReply*);
+     void displayMessage(QString msg);
 
      void on_backToLogin_clicked();
 
-     void on_loginButtonBox_accepted();
+     void on_pushButton_clicked();
+
+     void on_getFileButton_clicked();
 
 private:
     Ui::MainWindow *ui;

@@ -1,11 +1,24 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "serverinterface.h"
+
 #include <QtNetwork/QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QUrlQuery>
 #include <QNetworkReply>
 #include <QDebug>
 #include <QStringRef>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QFile>
+#include <QTextStream>
+
+#include <QJsonValue>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QVariantMap>
+#include <QJsonArray>
+
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -18,6 +31,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->loginButton, SIGNAL(clicked()),this, SLOT(handleLogin()));
     QObject::connect(ui->cancelButton, SIGNAL(clicked()),this, SLOT());
     QObject::connect(ui->backToLogin, SIGNAL(clicked()),this, SLOT(on_backToLogin_clicked()));
+
+
 }
 
 MainWindow::~MainWindow()
@@ -26,65 +41,76 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::handleLogin(){
-    //ui->label->setText(ui->email->toPlainText());
 
-    QNetworkAccessManager *manager = new QNetworkAccessManager();
-
-     QNetworkReply *reply;
-
-        QUrl url("http://localhost:8080/signin");
-        QNetworkRequest request(url);
-
-        request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
-
-    //     QUrlQuery params;
-    //     params.addQueryItem("email", "testEmail");
-    //     params.addQueryItem("md5Password", "testPassword");
-    //     QString POSTDATA("email=blahEmail&md5Password=blahPass");
-        QByteArray postData;
-        postData.append("email=" + ui->email->text());
-        postData.append("&password=" + ui->password->text());
-        //QByteArray POSTDATABYTES("email=ceo@test.com&password=5f4dcc3b5aa765d61d8327deb882cf99");
-    //     POSTDATABYTES.append(POSTDATA);
-
-        manager->post(request, postData);
-        connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
+    ServerInterface *si = new ServerInterface();
+    connect(si, SIGNAL(loginSignal(QString)),this,SLOT(displayMessage(QString)));
 
 
+    QString enteredEmail = ui->email->text();
+    QString enterPassword = ui->password->text();
 
-            //ui->label->setText((reply->readAll()));
-
-    //    QCoreApplication a(argc, argv);
-    //    return a.exec();
+    si->handleLogin(enteredEmail, enterPassword);
 
 }
 
-void MainWindow::replyFinished(QNetworkReply *reply)
-{
-    qDebug() << "reply finished";
-    QString data = reply->readAll();
-    if(data.contains("success", Qt::CaseInsensitive)){
-        ui->statusLabel->setText(data);
+void MainWindow::displayMessage(QString msg){
+    if(msg.contains("success", Qt::CaseInsensitive)){
+        ui->statusLabel->setText(msg);
         ui->stackedWidget->setCurrentIndex(1);
-        ui->tabStatusLabel->setText(data);
+        ui->tabStatusLabel->setText(msg);
     }
     else{
         ui->statusLabel->setText("Invalid email or password");
     }
-
-
-    // document.setContent(reply);
 }
-
-
 
 void MainWindow::on_backToLogin_clicked()
 {
     ui->stackedWidget->setCurrentIndex(0);
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+    QString filename = QFileDialog::getOpenFileName(
+                this,
+                tr("Open File"),
+                QDir::homePath(),
+                "All files (*.*)"
+
+                );
+    QMessageBox::information(this, tr("File Name"), filename);
+
+
+        QFile file(filename);
+        if(!file.open(QIODevice::ReadOnly)) {
+
+        }
+
+        QTextStream in(&file);
+        ui->textBrowser->setText(in.readAll());
+}
+
+void MainWindow::on_getFileButton_clicked()
+{
+    QNetworkAccessManager *manager = new QNetworkAccessManager(this);
+        connect(manager,SIGNAL(finished(QNetworkReply*)),this,SLOT(requestReceived(QNetworkReply*)));
+    manager->get(QNetworkRequest(QUrl("http://localhost:8080/UserFileList?userId=0000000001")));
 
 }
 
-void MainWindow::on_loginButtonBox_accepted()
-{
+void MainWindow::requestReceived(QNetworkReply* reply){
+
+    QString data = reply->readAll();
+
+    QJsonDocument jsonResponse = QJsonDocument::fromJson(data.toUtf8());
+    QJsonObject jsonObj = jsonResponse.object();
+    QJsonArray jsonArray = jsonObj["actualList"].toArray();
+
+
+    for(int i=0; i< jsonArray.size(); i++){
+    qDebug() << "files:" << jsonArray[i].toString();
+    ui->textBrowser->append(jsonArray[i].toString());
+    }
+
 
 }

@@ -36,12 +36,11 @@
        <bool>true</bool>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="login">
        <property name="styleSheet">
-        <string notr="true">
-</string>
+        <string notr="true"/>
        </property>
        <widget class="QFrame" name="verticalFrame">
         <property name="geometry">
@@ -167,7 +166,7 @@ QFrame{
          </rect>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="Dashboard">
          <attribute name="title">
@@ -207,6 +206,42 @@ QFrame{
          <attribute name="title">
           <string>Encrypt</string>
          </attribute>
+         <widget class="QPushButton" name="pushButton">
+          <property name="geometry">
+           <rect>
+            <x>160</x>
+            <y>20</y>
+            <width>131</width>
+            <height>34</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Open FIle Dialog</string>
+          </property>
+         </widget>
+         <widget class="QTextBrowser" name="textBrowser">
+          <property name="geometry">
+           <rect>
+            <x>40</x>
+            <y>90</y>
+            <width>371</width>
+            <height>261</height>
+           </rect>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="getFileButton">
+          <property name="geometry">
+           <rect>
+            <x>170</x>
+            <y>50</y>
+            <width>113</width>
+            <height>32</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Get File List</string>
+          </property>
+         </widget>
         </widget>
         <widget class="QWidget" name="Decrypt">
          <attribute name="title">

@@ -6,6 +6,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
+#include <QString>
 
 class ServerInterface : public QObject
 {
@@ -21,6 +22,7 @@ public slots:
    void replyFinished(QNetworkReply*);
 
 signals:
+   void loginSignal(QString msg);
 
 };
 
