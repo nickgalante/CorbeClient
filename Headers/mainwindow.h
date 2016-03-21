@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include <QNetworkReply>
+#include <QStringListModel>
+
 
 namespace Ui {
 class MainWindow;
@@ -31,8 +33,15 @@ private slots:
 
      void on_getFileButton_clicked();
 
+     void doDownload();
+
+     void updateProgress(qint64, qint64);
+
+     void on_fileList_clicked(const QModelIndex &index);
+
 private:
     Ui::MainWindow *ui;
+    QStringListModel *model;
 };
 
 #endif // MAINWINDOW_H

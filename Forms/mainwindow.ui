@@ -166,7 +166,7 @@ QFrame{
          </rect>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>2</number>
         </property>
         <widget class="QWidget" name="Dashboard">
          <attribute name="title">
@@ -186,19 +186,6 @@ QFrame{
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-         <widget class="QPushButton" name="backToLogin">
-          <property name="geometry">
-           <rect>
-            <x>160</x>
-            <y>330</y>
-            <width>113</width>
-            <height>32</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Back to Login</string>
           </property>
          </widget>
         </widget>
@@ -229,11 +216,16 @@ QFrame{
            </rect>
           </property>
          </widget>
+        </widget>
+        <widget class="QWidget" name="Decrypt">
+         <attribute name="title">
+          <string>Decrypt</string>
+         </attribute>
          <widget class="QPushButton" name="getFileButton">
           <property name="geometry">
            <rect>
             <x>170</x>
-            <y>50</y>
+            <y>30</y>
             <width>113</width>
             <height>32</height>
            </rect>
@@ -242,10 +234,56 @@ QFrame{
            <string>Get File List</string>
           </property>
          </widget>
+         <widget class="QPushButton" name="getFile">
+          <property name="geometry">
+           <rect>
+            <x>170</x>
+            <y>0</y>
+            <width>113</width>
+            <height>32</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>get file</string>
+          </property>
+         </widget>
+         <widget class="QProgressBar" name="downloadProgress">
+          <property name="geometry">
+           <rect>
+            <x>110</x>
+            <y>60</y>
+            <width>251</width>
+            <height>21</height>
+           </rect>
+          </property>
+          <property name="value">
+           <number>0</number>
+          </property>
+         </widget>
+         <widget class="QListView" name="fileList">
+          <property name="geometry">
+           <rect>
+            <x>30</x>
+            <y>120</y>
+            <width>391</width>
+            <height>241</height>
+           </rect>
+          </property>
+         </widget>
+         <widget class="QLineEdit" name="fileName">
+          <property name="geometry">
+           <rect>
+            <x>30</x>
+            <y>90</y>
+            <width>391</width>
+            <height>21</height>
+           </rect>
+          </property>
+         </widget>
         </widget>
-        <widget class="QWidget" name="Decrypt">
+        <widget class="QWidget" name="Logout">
          <attribute name="title">
-          <string>Decrypt</string>
+          <string>Logout</string>
          </attribute>
         </widget>
        </widget>

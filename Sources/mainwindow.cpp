@@ -28,9 +28,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->setupUi(this);
 
+    model = new QStringListModel(this);
+
+
     QObject::connect(ui->loginButton, SIGNAL(clicked()),this, SLOT(handleLogin()));
     QObject::connect(ui->cancelButton, SIGNAL(clicked()),this, SLOT());
-    QObject::connect(ui->backToLogin, SIGNAL(clicked()),this, SLOT(on_backToLogin_clicked()));
+    QObject::connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(on_backToLogin_clicked()));
+    QObject::connect(ui->getFile, SIGNAL(clicked()), this, SLOT(doDownload()));
 
 
 }
@@ -57,6 +61,7 @@ void MainWindow::displayMessage(QString msg){
     if(msg.contains("success", Qt::CaseInsensitive)){
         ui->statusLabel->setText(msg);
         ui->stackedWidget->setCurrentIndex(1);
+        ui->tabWidget->setCurrentIndex(0);
         ui->tabStatusLabel->setText(msg);
     }
     else{
@@ -66,28 +71,35 @@ void MainWindow::displayMessage(QString msg){
 
 void MainWindow::on_backToLogin_clicked()
 {
-    ui->stackedWidget->setCurrentIndex(0);
+    if(ui->tabWidget->currentIndex()==3){
+
+            ui->stackedWidget->setCurrentIndex(0);
+        }
 }
 
 void MainWindow::on_pushButton_clicked()
 {
-    QString filename = QFileDialog::getOpenFileName(
+    QString fileName = QFileDialog::getOpenFileName(
                 this,
                 tr("Open File"),
                 QDir::homePath(),
                 "All files (*.*)"
 
                 );
-    QMessageBox::information(this, tr("File Name"), filename);
+    QMessageBox::information(this, tr("File Name"), fileName);
+
+    ServerInterface *si = new ServerInterface();
+
+    si->sendFile(fileName);
 
 
-        QFile file(filename);
+        /*QFile file(filename);
         if(!file.open(QIODevice::ReadOnly)) {
 
         }
 
         QTextStream in(&file);
-        ui->textBrowser->setText(in.readAll());
+        ui->textBrowser->setText(in.readAll());*/
 }
 
 void MainWindow::on_getFileButton_clicked()
@@ -106,11 +118,36 @@ void MainWindow::requestReceived(QNetworkReply* reply){
     QJsonObject jsonObj = jsonResponse.object();
     QJsonArray jsonArray = jsonObj["actualList"].toArray();
 
-
+    QStringList List;
     for(int i=0; i< jsonArray.size(); i++){
-    qDebug() << "files:" << jsonArray[i].toString();
-    ui->textBrowser->append(jsonArray[i].toString());
+        qDebug() << "files:" << jsonArray[i].toString();
+        List.append(jsonArray[i].toString());
     }
 
+    model->setStringList(List);
+    ui->fileList->setModel(model);
+
+}
+void MainWindow::doDownload(){
+    qDebug() << "Getting file";
+    ui->downloadProgress->setValue(0);
+    ServerInterface *si = new ServerInterface();
+    connect(si, SIGNAL(progressSignal(qint64, qint64)),this,SLOT(updateProgress(qint64, qint64)));
+
+    si->getFile();
+
+}
+void MainWindow::updateProgress(qint64 read, qint64 total){
+    ui->downloadProgress->setMaximum(1073741824);
+    ui->downloadProgress->setValue(read);
+}
+
+
+
+void MainWindow::on_fileList_clicked(const QModelIndex &index)
+{
+    qDebug() <<"Setting text";
+    QString val = ui->fileList->model()->data(index).toString();
+    ui->fileName->setText(val);
 
 }

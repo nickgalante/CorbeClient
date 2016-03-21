@@ -7,6 +7,8 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QString>
+#include <QProgressBar>
+#include <QFile>
 
 class ServerInterface : public QObject
 {
@@ -14,15 +16,26 @@ class ServerInterface : public QObject
 public:
     explicit ServerInterface(QObject *parent = 0);
 
-    static bool getFile(QString userid, QString name);
-    static int postFile(QString userid, QString name, QString file_location);
+    bool getFile();
+    //void sendFile(QString userid, QString name, QString file_location);
+    void sendFile(QString name);
     void handleLogin(QString email, QString password);
+    void startDownload();
+
 
 public slots:
    void replyFinished(QNetworkReply*);
+   void downloadFinished(QNetworkReply*);
+   void updateDownloadProgress(qint64 read, qint64 total);
+   void httpReadyRead();
 
 signals:
    void loginSignal(QString msg);
+   void progressSignal(qint64 read, qint64 total);
+
+private:
+   QNetworkReply *rep;
+   QFile *file;
 
 };
 
