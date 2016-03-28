@@ -25,9 +25,9 @@ public:
 
 public slots:
    void replyFinished(QNetworkReply*);
-   void downloadFinished(QNetworkReply*);
-   void updateDownloadProgress(qint64 read, qint64 total);
-   void httpReadyRead();
+   //void downloadFinished(QNetworkReply*);
+   //void updateDownloadProgress(qint64 read, qint64 total);
+   //void httpReadyRead();
 
 signals:
    void loginSignal(QString msg);

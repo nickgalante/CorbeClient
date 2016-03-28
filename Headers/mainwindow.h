@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QNetworkReply>
 #include <QStringListModel>
+#include <QStandardItemModel>
 
 
 namespace Ui {
@@ -29,19 +30,19 @@ private slots:
 
      void on_backToLogin_clicked();
 
-     void on_pushButton_clicked();
-
      void on_getFileButton_clicked();
 
      void doDownload();
 
      void updateProgress(qint64, qint64);
 
+     void on_fileChooseButton_clicked();
+
      void on_fileList_clicked(const QModelIndex &index);
 
 private:
     Ui::MainWindow *ui;
-    QStringListModel *model;
+    QStandardItemModel *model;
 };
 
 #endif // MAINWINDOW_H

@@ -1,5 +1,6 @@
 #include "serverinterface.h"
 #include "mainwindow.h"
+#include "downloadworker.h"
 
 
 #include <iostream>
@@ -22,45 +23,49 @@ ServerInterface::ServerInterface(QObject *parent) : QObject(parent)
 
 bool ServerInterface::getFile() {
 
+    QString token = "blahToken";
+    QString email = "BlahEmail";
+    QString fileName = "BlachFileName";
+
     QNetworkAccessManager *manager = new QNetworkAccessManager();
     QNetworkRequest req(QUrl("http://localhost:8080/returnFile"));
-    rep = manager->get(req);
 
-    file = new QFile("/Users/jgalante1/downloads/largefile.txt");
-    file->open(QIODevice::WriteOnly);
 
-    connect(rep, SIGNAL(readyRead()), this, SLOT(httpReadyRead()));
+    DownloadWorker* dwptr = new DownloadWorker(token, email, fileName, manager, req);
 
-    connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(downloadFinished(QNetworkReply*)));
 
-    connect(rep, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(updateDownloadProgress(qint64, qint64)));
+    connect(dwptr->rep, SIGNAL(readyRead()), dwptr, SLOT(httpReadyRead()));
+    connect(dwptr->manager, SIGNAL(finished(QNetworkReply*)), dwptr, SLOT(downloadFinished(QNetworkReply*)));
+    connect(dwptr->rep, SIGNAL(downloadProgress(qint64, qint64)), dwptr, SLOT(updateDownloadProgress(qint64, qint64)));
 
+    qDebug()<<"From main thread: "<<QThread::currentThreadId();
+    dwptr->start();
     return true;
 }
 
 
-void ServerInterface::downloadFinished(QNetworkReply *rep)
+/*void ServerInterface::downloadFinished(QNetworkReply *rep)
 {
     qDebug() << "finished";
     file->close();
-}
+}*/
 
 
-void ServerInterface::httpReadyRead()
+/*void ServerInterface::httpReadyRead()
 {
     QByteArray data;
     if (file)
         data = rep->readAll();
     qDebug() << "writing";
-        //file->write(data);
-}
+        file->write(data);
+}*/
 
-void ServerInterface::updateDownloadProgress(qint64 read, qint64 total)
+/*void ServerInterface::updateDownloadProgress(qint64 read, qint64 total)
 {
     qDebug() << read << total;
     emit progressSignal(read, total);
 }
-
+*/
 
 
 
@@ -107,28 +112,12 @@ void ServerInterface::sendFile(QString filename){
 
         file.close();
 
-        /*QByteArray boundary;
-
-           QByteArray datas(QString("--" + boundary + "\r\n").toAscii());
-           datas += "Content-Disposition: form-data; name=\"file\"; filename=\""+file.fileName()+"\"\r\n";
-
-           datas += "Content-Type: image/jpeg\r\n\r\n"; //file type is here
-           datas += line; //and our file is giving to form object
-           datas += "\r\n";
-           datas += QString("--" + boundary + "\r\n\r\n").toAscii();
-           datas += "Content-Disposition: form-data; name=\"upload\"\r\n\r\n";
-           datas += "Uploader\r\n";
-           datas += QString("--" + boundary + "--\r\n").toAscii();
-           */
-
         QNetworkAccessManager *manager = new QNetworkAccessManager();
 
             QUrl url("http://localhost:8080/encrypt");
             QNetworkRequest request(url);
 
             request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
-
-
 
            //connect(manager,SIGNAL(finished(QNetworkReply*)),this,SLOT(erroron_filesend(QNetworkReply*)));
             qDebug() << "Sending file";

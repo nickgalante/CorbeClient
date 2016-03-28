@@ -18,6 +18,8 @@
 #include <QJsonObject>
 #include <QVariantMap>
 #include <QJsonArray>
+#include <QStringList>
+#include <iterator>
 
 
 
@@ -28,7 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->setupUi(this);
 
-    model = new QStringListModel(this);
+    //model = new QStringListModel(this);
 
 
     QObject::connect(ui->loginButton, SIGNAL(clicked()),this, SLOT(handleLogin()));
@@ -77,30 +79,7 @@ void MainWindow::on_backToLogin_clicked()
         }
 }
 
-void MainWindow::on_pushButton_clicked()
-{
-    QString fileName = QFileDialog::getOpenFileName(
-                this,
-                tr("Open File"),
-                QDir::homePath(),
-                "All files (*.*)"
 
-                );
-    QMessageBox::information(this, tr("File Name"), fileName);
-
-    ServerInterface *si = new ServerInterface();
-
-    si->sendFile(fileName);
-
-
-        /*QFile file(filename);
-        if(!file.open(QIODevice::ReadOnly)) {
-
-        }
-
-        QTextStream in(&file);
-        ui->textBrowser->setText(in.readAll());*/
-}
 
 void MainWindow::on_getFileButton_clicked()
 {
@@ -116,18 +95,39 @@ void MainWindow::requestReceived(QNetworkReply* reply){
 
     QJsonDocument jsonResponse = QJsonDocument::fromJson(data.toUtf8());
     QJsonObject jsonObj = jsonResponse.object();
-    QJsonArray jsonArray = jsonObj["actualList"].toArray();
 
-    QStringList List;
-    for(int i=0; i< jsonArray.size(); i++){
-        qDebug() << "files:" << jsonArray[i].toString();
-        List.append(jsonArray[i].toString());
-    }
+    QJsonObject fileObj = jsonObj["userFileMap"].toObject();
+    qDebug() << fileObj;
 
-    model->setStringList(List);
-    ui->fileList->setModel(model);
+    ui->fileList->clear();
+    ui->fileList->setRowCount(0);
 
+    ui->fileList->setColumnCount(2);
+
+    QStringList headerValues;
+    headerValues << "File Name" << "File Size";
+    ui->fileList->setHorizontalHeaderLabels(headerValues);
+    QJsonObject::iterator it;
+    for (it = fileObj.begin(); it != fileObj.end(); it++) {
+           QString key = it.key();
+           int value = it.value().toInt();
+           ui->fileList->insertRow(ui->fileList->rowCount());
+           ui->fileList->setItem(ui->fileList->rowCount()-1, 0, new QTableWidgetItem(key));
+           ui->fileList->setItem(ui->fileList->rowCount()-1, 1, new QTableWidgetItem(QString::number(value)));
+
+       }
+
+    ui->fileList->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 }
+
+void MainWindow::on_fileList_clicked(const QModelIndex &index)
+{
+    qDebug() <<"Setting text";
+    QString val = ui->fileList->model()->data(index).toString();
+    ui->fileName->setText(val);
+}
+
+
 void MainWindow::doDownload(){
     qDebug() << "Getting file";
     ui->downloadProgress->setValue(0);
@@ -138,16 +138,29 @@ void MainWindow::doDownload(){
 
 }
 void MainWindow::updateProgress(qint64 read, qint64 total){
-    ui->downloadProgress->setMaximum(1073741824);
+    ui->downloadProgress->setMaximum(total);
     ui->downloadProgress->setValue(read);
 }
 
 
 
-void MainWindow::on_fileList_clicked(const QModelIndex &index)
+void MainWindow::on_fileChooseButton_clicked()
 {
-    qDebug() <<"Setting text";
-    QString val = ui->fileList->model()->data(index).toString();
-    ui->fileName->setText(val);
+    QString fileName = QFileDialog::getOpenFileName(
+                this,
+                tr("Open File"),
+                QDir::homePath(),
+                "All files (*.*)"
+
+                );
+    //QMessageBox::information(this, tr("File Name"), fileName);
+
+    ServerInterface *si = new ServerInterface();
+
+    ui->uploadFileLineEdit->setText(fileName);
+    //si->sendFile(fileName);
 
 }
+
+
+
