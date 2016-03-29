@@ -17,16 +17,18 @@ public:
     explicit ServerInterface(QObject *parent = 0);
 
     bool getFile();
+    bool getFile(QString fileName, QString token);
     //void sendFile(QString userid, QString name, QString file_location);
     void sendFile(QString name);
     void handleLogin(QString email, QString password);
     void startDownload();
-
+    QString getToken();
 
 public slots:
    void replyFinished(QNetworkReply*);
+   void uploadReplyFinished(); //when the upload is complete do this
    //void downloadFinished(QNetworkReply*);
-   //void updateDownloadProgress(qint64 read, qint64 total);
+   void updateDownloadProgress(qint64 read, qint64 total);
    //void httpReadyRead();
 
 signals:
@@ -34,9 +36,11 @@ signals:
    void progressSignal(qint64 read, qint64 total);
 
 private:
-   QNetworkReply *rep;
+   QString token;
+   QString fileName;
+   QNetworkReply *reply;
    QFile *file;
-
 };
 
 #endif // SERVERINTERFACE_H
+

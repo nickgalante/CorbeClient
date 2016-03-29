@@ -1,46 +1,32 @@
 #ifndef DOWNLOADWORKER_H
 #define DOWNLOADWORKER_H
 
-#include <QtCore>
-#include <QObject>
-#include <QByteArray>
-#include <QNetworkAccessManager>
-#include <QNetworkRequest>
-#include <QNetworkReply>
-#include <QString>
-#include <QProgressBar>
 #include <QFile>
+#include <QString>
+#include <QNetworkReply>
+#include <QThread>
 
-class DownloadWorker : public QThread{
-
-
+class DownloadWorker : public QObject{
     Q_OBJECT
+
 public:
-    DownloadWorker(QString token, QString fileName, QNetworkReply *rep); //requesting your own file
-    DownloadWorker(QString token, QString email, QString fileName, QNetworkAccessManager *manager, QNetworkRequest req); //requesting someone elses.
-
-    QNetworkReply *rep;
-    QNetworkAccessManager *manager;
-
-public slots:
-//   void replyFinished(QNetworkReply*);
-   void downloadFinished(QNetworkReply*);
-   void updateDownloadProgress(qint64 read, qint64 total);
-   void httpReadyRead();
-
-signals:
-//   void loginSignal(QString msg);
-   void progressSignal(qint64 read, qint64 total);
+    DownloadWorker(QString token, QString filename, QString downloadToDirectory, QNetworkReply* reply);
 
 private:
     QString token;
-    QString fileName;
-    QString email;
-    QNetworkRequest req;
-    QFile *file;
+    QString filename;
+    QString downloadToDirectory;
+    QFile* fileToWriteTo;
+    QNetworkReply* reply;
     long totalWrote;
 
-    void run();
+
+private slots:
+    void onHttpReadyRead();
+    void downloadFinished(QNetworkReply *rep);
+
 };
 
+
 #endif // DOWNLOADWORKER_H
+

@@ -85,7 +85,7 @@ void MainWindow::on_getFileButton_clicked()
 {
     QNetworkAccessManager *manager = new QNetworkAccessManager(this);
         connect(manager,SIGNAL(finished(QNetworkReply*)),this,SLOT(requestReceived(QNetworkReply*)));
-    manager->get(QNetworkRequest(QUrl("http://localhost:8080/UserFileList?userId=0000000001")));
+    manager->get(QNetworkRequest(QUrl("http://localhost:8080/UserFileList?email=ceo@test.com")));
 
 }
 
@@ -124,7 +124,13 @@ void MainWindow::on_fileList_clicked(const QModelIndex &index)
 {
     qDebug() <<"Setting text";
     QString val = ui->fileList->model()->data(index).toString();
-    ui->fileName->setText(val);
+
+    ui->fileNameLineEdit->setText(val);
+}
+
+void MainWindow::on_downloadFileButton_clicked()
+{
+    doDownload();
 }
 
 
@@ -133,14 +139,15 @@ void MainWindow::doDownload(){
     ui->downloadProgress->setValue(0);
     ServerInterface *si = new ServerInterface();
     connect(si, SIGNAL(progressSignal(qint64, qint64)),this,SLOT(updateProgress(qint64, qint64)));
+    si->getFile(ui->fileNameLineEdit->text(), "gG101E5UObnlykhQ");
 
-    si->getFile();
 
 }
 void MainWindow::updateProgress(qint64 read, qint64 total){
-    ui->downloadProgress->setMaximum(total);
+    ui->downloadProgress->setMaximum(1073741824);
     ui->downloadProgress->setValue(read);
 }
+
 
 
 
@@ -158,9 +165,10 @@ void MainWindow::on_fileChooseButton_clicked()
     ServerInterface *si = new ServerInterface();
 
     ui->uploadFileLineEdit->setText(fileName);
-    //si->sendFile(fileName);
 
 }
+
+
 
 
 

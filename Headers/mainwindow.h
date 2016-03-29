@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "serverinterface.h"
 #include <QMainWindow>
 #include <QNetworkReply>
 #include <QStringListModel>
@@ -40,9 +41,14 @@ private slots:
 
      void on_fileList_clicked(const QModelIndex &index);
 
+//     void on_pushButton_clicked();
+
+     void on_downloadFileButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     QStandardItemModel *model;
+    //ServerInterface* si;
 };
 
 #endif // MAINWINDOW_H

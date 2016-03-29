@@ -233,7 +233,7 @@ QFrame{
               </widget>
              </item>
              <item alignment="Qt::AlignHCenter">
-              <widget class="QPushButton" name="pushButton">
+              <widget class="QPushButton" name="uploadButton">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -302,10 +302,10 @@ QFrame{
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_3">
              <item>
-              <widget class="QLineEdit" name="fileName"/>
+              <widget class="QLineEdit" name="fileNameLineEdit"/>
              </item>
              <item>
-              <widget class="QPushButton" name="getFile_2">
+              <widget class="QPushButton" name="downloadFileButton">
                <property name="styleSheet">
                 <string notr="true"/>
                </property>

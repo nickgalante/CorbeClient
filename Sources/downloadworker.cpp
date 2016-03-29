@@ -12,62 +12,39 @@
 #include <QString>
 #include <QProgressBar>
 
-//requesting your own file
-DownloadWorker::DownloadWorker(QString token, QString fileName, QNetworkReply *rep){
+
+
+DownloadWorker::DownloadWorker(QString token, QString fileName, QString downloadToDirectory, QNetworkReply* reply){
     this->token = token;
-    this->fileName = fileName;
+    this->filename = fileName;
+    this->downloadToDirectory = downloadToDirectory;
+    this->reply = reply;
+
+    this->fileToWriteTo = new QFile(downloadToDirectory + fileName);
     this->totalWrote = 0;
-}
+    this->fileToWriteTo->open(QIODevice::WriteOnly);
 
-
-//requesting someone elses.
-DownloadWorker::DownloadWorker(QString token, QString email, QString fileName, QNetworkAccessManager *manager, QNetworkRequest req){
-    this->token = token;
-    this->email = email;
-    this->fileName = fileName;
-    this->manager = manager;
-    this->req = req;
-    this->rep = this->manager->get(this->req);
-    this->totalWrote = 0;
-}
-
-void DownloadWorker::run(){
-    qDebug()<<"From child thread RUN: "<<QThread::currentThreadId();
-
-    this->file = new QFile("/Users/jgalante1/Downloads/LargeFile.txt"); //saves it here, if filewriting is enabled
-    if(this->file->open(QIODevice::WriteOnly)){
-        qDebug() << "File Has Been Created" << endl;
-
-    }
-    else{
-        qDebug() << "Failed to Create File" << endl;
+    //file not good, throw exception while we're still ahead of the game.
+    if(!this->fileToWriteTo->isWritable()){
+        throw ("File was unable to be opened for writing: " + downloadToDirectory);
     }
 }
 
-void DownloadWorker::httpReadyRead()
-{
-    qDebug()<<"From child thread httpreadyread: "<<QThread::currentThreadId();
+
+void DownloadWorker::onHttpReadyRead(){
+
     QByteArray data;
-    if (this->file){
-        data = rep->readAll();
-        this->totalWrote += this->file->write(data);
-        this->file->seek(this->totalWrote);
-        qDebug() << "Wrote this many bytes: " << this->totalWrote;
-    }
-
+      if (this->fileToWriteTo->isWritable()){
+          data = this->reply->readAll();
+          this->totalWrote += this->fileToWriteTo->write(data);
+          this->fileToWriteTo->seek(this->totalWrote);
+          this->fileToWriteTo->flush();
+      }
 }
+
 
 void DownloadWorker::downloadFinished(QNetworkReply *rep)
 {
-    qDebug() << "finished";
-    this->file->close();
+    qDebug() << "download finished";
+    this->fileToWriteTo->close();
 }
-
-void DownloadWorker::updateDownloadProgress(qint64 read, qint64 total)
-{
-    qDebug() << "updateDownloadProgress: " << read << total;
-    emit progressSignal(read, total);
-}
-
-
-
