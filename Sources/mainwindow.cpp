@@ -48,14 +48,15 @@ MainWindow::~MainWindow()
 
 void MainWindow::handleLogin(){
 
-    ServerInterface *si = new ServerInterface();
-    connect(si, SIGNAL(loginSignal(QString)),this,SLOT(displayMessage(QString)));
+    this->si = new ServerInterface();
+//    ServerInterface *si = new ServerInterface();
+    connect(this->si, SIGNAL(loginSignal(QString)),this,SLOT(displayMessage(QString)));
 
 
     QString enteredEmail = ui->email->text();
     QString enterPassword = ui->password->text();
 
-    si->handleLogin(enteredEmail, enterPassword);
+    this->si->handleLogin(enteredEmail, enterPassword);
 
 }
 
@@ -110,7 +111,7 @@ void MainWindow::requestReceived(QNetworkReply* reply){
     QJsonObject::iterator it;
     for (it = fileObj.begin(); it != fileObj.end(); it++) {
            QString key = it.key();
-           int value = it.value().toInt();
+           qlonglong value = it.value().toVariant().toLongLong();
            ui->fileList->insertRow(ui->fileList->rowCount());
            ui->fileList->setItem(ui->fileList->rowCount()-1, 0, new QTableWidgetItem(key));
            ui->fileList->setItem(ui->fileList->rowCount()-1, 1, new QTableWidgetItem(QString::number(value)));
@@ -137,9 +138,9 @@ void MainWindow::on_downloadFileButton_clicked()
 void MainWindow::doDownload(){
     qDebug() << "Getting file";
     ui->downloadProgress->setValue(0);
-    ServerInterface *si = new ServerInterface();
-    connect(si, SIGNAL(progressSignal(qint64, qint64)),this,SLOT(updateProgress(qint64, qint64)));
-    si->getFile(ui->fileNameLineEdit->text(), "gG101E5UObnlykhQ");
+//    ServerInterface *si = new ServerInterface();
+    connect(this->si, SIGNAL(progressSignal(qint64, qint64)), this, SLOT(updateProgress(qint64, qint64)));
+    si->getFile(ui->fileNameLineEdit->text(), this->si->getToken());
 
 
 }
@@ -162,13 +163,17 @@ void MainWindow::on_fileChooseButton_clicked()
                 );
     //QMessageBox::information(this, tr("File Name"), fileName);
 
-    ServerInterface *si = new ServerInterface();
+//    ServerInterface *si = new ServerInterface();
 
     ui->uploadFileLineEdit->setText(fileName);
 
 }
 
 
-
-
-
+void MainWindow::on_uploadButton_clicked()
+{
+    QString uploadFileName = this->ui->uploadFileLineEdit->text();
+//    qDebug() << "Data: " << uploadFileName;
+//    qDebug() << "From parent thread MainWindow::on_uploadButton_clicked(): "<< QThread::currentThreadId();
+    this->si->uploadFile(uploadFileName);
+}
