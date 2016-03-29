@@ -45,10 +45,12 @@ private slots:
 
      void on_downloadFileButton_clicked();
 
+     void on_uploadButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     QStandardItemModel *model;
-    //ServerInterface* si;
+    ServerInterface* si;
 };
 
 #endif // MAINWINDOW_H

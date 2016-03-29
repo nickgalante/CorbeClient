@@ -20,6 +20,7 @@ public:
     bool getFile(QString fileName, QString token);
     //void sendFile(QString userid, QString name, QString file_location);
     void sendFile(QString name);
+    void uploadFile(QString fileNameAndDirectory); //the one we use
     void handleLogin(QString email, QString password);
     void startDownload();
     QString getToken();

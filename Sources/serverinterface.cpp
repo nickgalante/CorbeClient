@@ -1,6 +1,7 @@
 #include "serverinterface.h"
 #include "mainwindow.h"
 #include "downloadworker.h"
+#include "uploadworker.h"
 
 
 #include <iostream>
@@ -14,6 +15,7 @@
 #include <QUrlQuery>
 #include <QNetworkReply>
 #include <QDebug>
+#include <QStandardPaths>
 #include <QString>
 #include <QProgressBar>
 
@@ -60,7 +62,8 @@ bool ServerInterface::getFile(QString fileName, QString token) {
    //Create a new thread,a new dw worker, connect them all, and fire off the damn thing
    this->token = token;
    this->fileName = fileName;
-   QString downloadToDirectory = "/Users/jgalante1/Downloads/";
+   QString downloadToDirectory = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation) + "/";
+   qDebug() << "Writing " << fileName << " to " << downloadToDirectory;
 
    QByteArray postData;
    postData.append("token=" + this->token + "&");
@@ -115,7 +118,17 @@ void ServerInterface::handleLogin(QString email, QString password){
 void ServerInterface::replyFinished(QNetworkReply *reply)
 {
     QString data = reply->readAll();
-    emit loginSignal(data);
+        if(data.isNull() || data.isEmpty()){
+            throw "ServerInterface::replyFinished has received null or empty data.";
+        } else{
+            //extracts out the token from a successful response.
+            QString delimiter = "Token:";
+            int indexOfToken = data.indexOf(delimiter);
+            QString token = data.mid(delimiter.size() + indexOfToken);
+            this->token = token;
+
+            emit loginSignal(data);
+        }
 }
 
 
@@ -183,6 +196,22 @@ void ServerInterface::uploadReplyFinished()
 //    } else{
 //        qDebug() << "Upload reply finished? " << data;
 //    }
+}
+
+
+//MIGHT NEED TO STORE THE UPLOADWORKER* AS A GLOBAL/EXTERNAL VARIABLE
+void ServerInterface::uploadFile(QString fileNameAndDirectory){
+
+    qDebug() << "ServerInterface::uploadFile(QString fileNameAndDirectory) fileNameAndDirectory: " << fileNameAndDirectory;
+    qDebug() << "ServerInterface::uploadFile(QString fileNameAndDirectory) token: " << this->token;
+    qDebug() << "ServerInterface::uploadFile(QString fileNameAndDirectory) making the upload worker";
+    UploadWorker* uploadWorker = new UploadWorker(this->token, fileNameAndDirectory);
+    QThread* t = new QThread();
+    uploadWorker->moveToThread(t);
+    uploadWorker->run();
+    t->start();
+
+    qDebug() << "ServerInterface::uploadFile(QString fileNameAndDirectory) already started";
 }
 
 
