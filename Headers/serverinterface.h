@@ -24,6 +24,7 @@ public:
     void handleLogin(QString email, QString password);
     void startDownload();
     QString getToken();
+    bool isServerContactable();
 
 public slots:
    void replyFinished(QNetworkReply*);

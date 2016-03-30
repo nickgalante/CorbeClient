@@ -49,15 +49,19 @@ MainWindow::~MainWindow()
 void MainWindow::handleLogin(){
 
     this->si = new ServerInterface();
-//    ServerInterface *si = new ServerInterface();
-    connect(this->si, SIGNAL(loginSignal(QString)),this,SLOT(displayMessage(QString)));
+
+    if(! this->si->isServerContactable()){
+        displayServerIsNotContactable();
+    } else{
+        //    ServerInterface *si = new ServerInterface();
+            connect(this->si, SIGNAL(loginSignal(QString)),this,SLOT(displayMessage(QString)));
 
 
-    QString enteredEmail = ui->email->text();
-    QString enterPassword = ui->password->text();
+            QString enteredEmail = ui->email->text();
+            QString enterPassword = ui->password->text();
 
-    this->si->handleLogin(enteredEmail, enterPassword);
-
+            this->si->handleLogin(enteredEmail, enterPassword);
+    }
 }
 
 void MainWindow::displayMessage(QString msg){
@@ -70,6 +74,11 @@ void MainWindow::displayMessage(QString msg){
     else{
         ui->statusLabel->setText("Invalid email or password");
     }
+}
+
+void MainWindow::displayServerIsNotContactable(){
+    this->ui->stackedWidget->setCurrentIndex(0);
+    ui->statusLabel->setText("Server is currently unreachable.");
 }
 
 void MainWindow::on_backToLogin_clicked()

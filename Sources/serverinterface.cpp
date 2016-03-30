@@ -8,6 +8,7 @@
 #include <fstream>
 #include <QFile>
 #include <QDebug>
+#include <QHostAddress>
 #include <QHttpMultiPart>
 #include <QHttpPart>
 #include <QtNetwork/QNetworkAccessManager>
@@ -212,6 +213,14 @@ void ServerInterface::uploadFile(QString fileNameAndDirectory){
     t->start();
 
     qDebug() << "ServerInterface::uploadFile(QString fileNameAndDirectory) already started";
+}
+
+
+bool ServerInterface::isServerContactable(){
+    QTcpSocket socketToServer;
+    QHostAddress serverAddress("127.0.0.1");
+    socketToServer.connectToHost(serverAddress, 8080);
+    return socketToServer.waitForConnected(2000); //waits 2 seconds...
 }
 
 
