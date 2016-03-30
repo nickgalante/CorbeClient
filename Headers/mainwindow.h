@@ -28,6 +28,7 @@ private slots:
      //void replyFinished(QNetworkReply*);
      void requestReceived(QNetworkReply*);
      void displayMessage(QString msg);
+     void displayServerIsNotContactable();
 
      void on_backToLogin_clicked();
 
@@ -51,6 +52,7 @@ private:
     Ui::MainWindow *ui;
     QStandardItemModel *model;
     ServerInterface* si;
+
 };
 
 #endif // MAINWINDOW_H
