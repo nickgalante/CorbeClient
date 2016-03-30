@@ -6,20 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>500</width>
-    <height>500</height>
+    <width>550</width>
+    <height>550</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>500</width>
-    <height>500</height>
-   </size>
-  </property>
-  <property name="maximumSize">
-   <size>
-    <width>500</width>
-    <height>500</height>
+    <width>550</width>
+    <height>550</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -29,7 +23,7 @@
    <property name="enabled">
     <bool>true</bool>
    </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_2">
+   <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="enabled">
@@ -45,7 +39,7 @@
        <widget class="QFrame" name="verticalFrame">
         <property name="geometry">
          <rect>
-          <x>50</x>
+          <x>80</x>
           <y>70</y>
           <width>382</width>
           <height>201</height>
@@ -74,6 +68,24 @@ QFrame{
          <enum>QFrame::NoFrame</enum>
         </property>
         <layout class="QGridLayout" name="gridLayout">
+         <item row="4" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <widget class="QPushButton" name="cancelButton">
+             <property name="text">
+              <string>Cancel</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="loginButton">
+             <property name="text">
+              <string>Login</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
          <item row="2" column="1">
           <widget class="QLineEdit" name="password">
            <property name="styleSheet">
@@ -97,13 +109,13 @@ QFrame{
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
-          <widget class="QLineEdit" name="email">
-           <property name="enabled">
-            <bool>true</bool>
-           </property>
+         <item row="0" column="0" colspan="2" alignment="Qt::AlignHCenter">
+          <widget class="QLabel" name="label">
            <property name="text">
-            <string>ceo@test.com</string>
+            <string>Login</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
            </property>
           </widget>
          </item>
@@ -120,6 +132,16 @@ QFrame{
            </property>
           </widget>
          </item>
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="email">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="text">
+            <string>ceo@test.com</string>
+           </property>
+          </widget>
+         </item>
          <item row="2" column="0">
           <widget class="QLabel" name="passwordLabel">
            <property name="text">
@@ -130,34 +152,6 @@ QFrame{
            </property>
           </widget>
          </item>
-         <item row="0" column="0" colspan="2" alignment="Qt::AlignHCenter">
-          <widget class="QLabel" name="label">
-           <property name="text">
-            <string>Login</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="1">
-          <layout class="QHBoxLayout" name="horizontalLayout">
-           <item>
-            <widget class="QPushButton" name="cancelButton">
-             <property name="text">
-              <string>Cancel</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="loginButton">
-             <property name="text">
-              <string>Login</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
         </layout>
        </widget>
       </widget>
@@ -166,7 +160,7 @@ QFrame{
         <item>
          <widget class="QTabWidget" name="tabWidget">
           <property name="currentIndex">
-           <number>1</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="Dashboard">
            <attribute name="title">
@@ -175,14 +169,14 @@ QFrame{
            <widget class="QLabel" name="tabStatusLabel">
             <property name="geometry">
              <rect>
-              <x>110</x>
+              <x>150</x>
               <y>30</y>
               <width>211</width>
               <height>71</height>
              </rect>
             </property>
             <property name="text">
-             <string>TextLabel</string>
+             <string>Login Status</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -193,170 +187,181 @@ QFrame{
            <attribute name="title">
             <string>Encrypt</string>
            </attribute>
-           <widget class="QWidget" name="verticalLayoutWidget">
-            <property name="geometry">
-             <rect>
-              <x>40</x>
-              <y>30</y>
-              <width>361</width>
-              <height>159</height>
-             </rect>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout">
-             <item alignment="Qt::AlignHCenter">
-              <widget class="QPushButton" name="fileChooseButton">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>113</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="styleSheet">
-                <string notr="true"/>
-               </property>
-               <property name="text">
-                <string>Choose File</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLineEdit" name="uploadFileLineEdit">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-             <item alignment="Qt::AlignHCenter">
-              <widget class="QPushButton" name="uploadButton">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="styleSheet">
-                <string notr="true"/>
-               </property>
-               <property name="text">
-                <string>Upload</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
+           <layout class="QGridLayout" name="gridLayout_4">
+            <item row="0" column="0">
+             <layout class="QVBoxLayout" name="verticalLayout">
+              <item alignment="Qt::AlignHCenter">
+               <widget class="QPushButton" name="fileChooseButton">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>113</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
+                <property name="text">
+                 <string>Choose File</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="uploadFileLineEdit">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item alignment="Qt::AlignHCenter">
+               <widget class="QPushButton" name="uploadButton">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
+                <property name="text">
+                 <string>Upload</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
           </widget>
           <widget class="QWidget" name="Decrypt">
            <attribute name="title">
             <string>Decrypt</string>
            </attribute>
-           <widget class="QPushButton" name="getFile">
-            <property name="geometry">
-             <rect>
-              <x>170</x>
-              <y>0</y>
-              <width>113</width>
-              <height>32</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>get file</string>
-            </property>
-           </widget>
-           <widget class="QProgressBar" name="downloadProgress">
-            <property name="geometry">
-             <rect>
-              <x>30</x>
-              <y>370</y>
-              <width>391</width>
-              <height>21</height>
-             </rect>
-            </property>
-            <property name="value">
-             <number>0</number>
-            </property>
-           </widget>
-           <widget class="QTableWidget" name="fileList">
-            <property name="geometry">
-             <rect>
-              <x>30</x>
-              <y>70</y>
-              <width>391</width>
-              <height>241</height>
-             </rect>
-            </property>
-           </widget>
-           <widget class="QWidget" name="horizontalLayoutWidget">
-            <property name="geometry">
-             <rect>
-              <x>30</x>
-              <y>310</y>
-              <width>391</width>
-              <height>41</height>
-             </rect>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_3">
-             <item>
-              <widget class="QLineEdit" name="fileNameLineEdit"/>
-             </item>
-             <item>
-              <widget class="QPushButton" name="downloadFileButton">
-               <property name="styleSheet">
-                <string notr="true"/>
-               </property>
+           <layout class="QGridLayout" name="gridLayout_2">
+            <item row="2" column="0" colspan="2">
+             <widget class="QTreeWidget" name="fileList">
+              <property name="styleSheet">
+               <string notr="true">QTreeView::item {
+ border: 1px solid #d9d9d9;
+    
+}
+
+QTreeView::item:hover {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #e7effd, stop: 1 #cbdaf1);
+    border: 1px solid #bfcde4;
+}
+
+QTreeView::item:selected {
+    border: 1px solid #567dbc;
+}
+
+QTreeView::item:selected:active{
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #6ea1f1, stop: 1 #567dbc);
+}
+
+QTreeView::item:selected:!active {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #6b9be8, stop: 1 #577fbf);
+}
+</string>
+              </property>
+              <property name="lineWidth">
+               <number>1</number>
+              </property>
+              <property name="autoExpandDelay">
+               <number>1</number>
+              </property>
+              <property name="indentation">
+               <number>0</number>
+              </property>
+              <property name="itemsExpandable">
+               <bool>true</bool>
+              </property>
+              <property name="wordWrap">
+               <bool>false</bool>
+              </property>
+              <attribute name="headerDefaultSectionSize">
+               <number>300</number>
+              </attribute>
+              <attribute name="headerMinimumSectionSize">
+               <number>21</number>
+              </attribute>
+              <attribute name="headerShowSortIndicator" stdset="0">
+               <bool>false</bool>
+              </attribute>
+              <attribute name="headerStretchLastSection">
+               <bool>false</bool>
+              </attribute>
+              <column>
                <property name="text">
-                <string>Download File</string>
+                <string notr="true">1</string>
                </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-           <widget class="QWidget" name="horizontalLayoutWidget_2">
-            <property name="geometry">
-             <rect>
-              <x>30</x>
-              <y>30</y>
-              <width>391</width>
-              <height>41</height>
-             </rect>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_4">
-             <item>
-              <widget class="QLabel" name="label_2">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>User Name</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QComboBox" name="comboBox"/>
-             </item>
-             <item>
-              <widget class="QPushButton" name="getFileButton">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>Refresh file list</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
+              </column>
+             </widget>
+            </item>
+            <item row="1" column="0" colspan="2">
+             <layout class="QHBoxLayout" name="horizontalLayout_4">
+              <item>
+               <widget class="QLabel" name="label_2">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>User Name</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="comboBox"/>
+              </item>
+              <item>
+               <widget class="QPushButton" name="getFileButton">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>Refresh file list</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="4" column="0" colspan="2">
+             <widget class="QProgressBar" name="downloadProgress">
+              <property name="value">
+               <number>0</number>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0" colspan="2">
+             <layout class="QHBoxLayout" name="horizontalLayout_3">
+              <item>
+               <widget class="QLineEdit" name="fileNameLineEdit"/>
+              </item>
+              <item>
+               <widget class="QPushButton" name="downloadFileButton">
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
+                <property name="text">
+                 <string>Download File</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
           </widget>
           <widget class="QWidget" name="Logout">
            <attribute name="title">
@@ -377,7 +382,7 @@ QFrame{
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>500</width>
+     <width>550</width>
      <height>22</height>
     </rect>
    </property>

@@ -20,6 +20,7 @@
 #include <QJsonArray>
 #include <QStringList>
 #include <iterator>
+#include <QTreeWidget>
 
 
 
@@ -36,7 +37,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->loginButton, SIGNAL(clicked()),this, SLOT(handleLogin()));
     QObject::connect(ui->cancelButton, SIGNAL(clicked()),this, SLOT());
     QObject::connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(on_backToLogin_clicked()));
-    QObject::connect(ui->getFile, SIGNAL(clicked()), this, SLOT(doDownload()));
+
+    on_getFileButton_clicked();
 
 
 }
@@ -92,7 +94,7 @@ void MainWindow::on_getFileButton_clicked()
 
 void MainWindow::requestReceived(QNetworkReply* reply){
 
-    QString data = reply->readAll();
+    /*QString data = reply->readAll();
 
     QJsonDocument jsonResponse = QJsonDocument::fromJson(data.toUtf8());
     QJsonObject jsonObj = jsonResponse.object();
@@ -118,7 +120,38 @@ void MainWindow::requestReceived(QNetworkReply* reply){
 
        }
 
-    ui->fileList->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->fileList->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);*/
+
+    ui->fileList->clear();
+    ui->fileList->setColumnCount(2);
+    ui->fileList->setHeaderLabels(QStringList() << "File Name" << "Size");
+
+    QString data = reply->readAll();
+
+        QJsonDocument jsonResponse = QJsonDocument::fromJson(data.toUtf8());
+        QJsonObject jsonObj = jsonResponse.object();
+
+        QJsonObject fileObj = jsonObj["userFileMap"].toObject();
+        qDebug() << fileObj;
+
+        QJsonObject::iterator it;
+        for (it = fileObj.begin(); it != fileObj.end(); it++) {
+               QString key = it.key();
+               qlonglong value = it.value().toVariant().toLongLong();
+
+               QTreeWidgetItem *treeItem = new QTreeWidgetItem(ui->fileList);
+
+                   // QTreeWidgetItem::setText(int column, const QString & text)
+                   treeItem->setText(0, key);
+                   treeItem->setText(1, QString::number(value));
+
+
+               //ui->fileList->setItem(ui->fileList->rowCount()-1, 0, new QTableWidgetItem(key));
+               //ui->fileList->setItem(ui->fileList->rowCount()-1, 1, new QTableWidgetItem(QString::number(value)));
+
+           }
+        ui->fileList->header()->setStretchLastSection(true);
+         ui->fileList->setAlternatingRowColors(true);
 }
 
 void MainWindow::on_fileList_clicked(const QModelIndex &index)
