@@ -28,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-
+    this->si = new ServerInterface();
     ui->setupUi(this);
 
     //model = new QStringListModel(this);
@@ -50,7 +50,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::handleLogin(){
 
-    this->si = new ServerInterface();
+    //this->si = new ServerInterface();
 
     if(! this->si->isServerContactable()){
         displayServerIsNotContactable();
@@ -103,33 +103,6 @@ void MainWindow::on_getFileButton_clicked()
 
 void MainWindow::requestReceived(QNetworkReply* reply){
 
-    /*QString data = reply->readAll();
-
-    QJsonDocument jsonResponse = QJsonDocument::fromJson(data.toUtf8());
-    QJsonObject jsonObj = jsonResponse.object();
-
-    QJsonObject fileObj = jsonObj["userFileMap"].toObject();
-    qDebug() << fileObj;
-
-    ui->fileList->clear();
-    ui->fileList->setRowCount(0);
-
-    ui->fileList->setColumnCount(2);
-
-    QStringList headerValues;
-    headerValues << "File Name" << "File Size";
-    ui->fileList->setHorizontalHeaderLabels(headerValues);
-    QJsonObject::iterator it;
-    for (it = fileObj.begin(); it != fileObj.end(); it++) {
-           QString key = it.key();
-           qlonglong value = it.value().toVariant().toLongLong();
-           ui->fileList->insertRow(ui->fileList->rowCount());
-           ui->fileList->setItem(ui->fileList->rowCount()-1, 0, new QTableWidgetItem(key));
-           ui->fileList->setItem(ui->fileList->rowCount()-1, 1, new QTableWidgetItem(QString::number(value)));
-
-       }
-
-    ui->fileList->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);*/
 
     ui->fileList->clear();
     ui->fileList->setColumnCount(2);
@@ -155,21 +128,17 @@ void MainWindow::requestReceived(QNetworkReply* reply){
                    treeItem->setText(1, QString::number(value));
 
 
+
+
                //ui->fileList->setItem(ui->fileList->rowCount()-1, 0, new QTableWidgetItem(key));
                //ui->fileList->setItem(ui->fileList->rowCount()-1, 1, new QTableWidgetItem(QString::number(value)));
 
            }
+
         ui->fileList->header()->setStretchLastSection(true);
          ui->fileList->setAlternatingRowColors(true);
 }
 
-void MainWindow::on_fileList_clicked(const QModelIndex &index)
-{
-    qDebug() <<"Setting text";
-    QString val = ui->fileList->model()->data(index).toString();
-
-    ui->fileNameLineEdit->setText(val);
-}
 
 void MainWindow::on_downloadFileButton_clicked()
 {
@@ -181,13 +150,13 @@ void MainWindow::doDownload(){
     qDebug() << "Getting file";
     ui->downloadProgress->setValue(0);
 //    ServerInterface *si = new ServerInterface();
-    connect(this->si, SIGNAL(progressSignal(qint64, qint64)), this, SLOT(updateProgress(qint64, qint64)));
+    connect(this->si, SIGNAL(progressSignal(qint64, qint64)), this, SLOT(updateProgress(qint64)));
     si->getFile(ui->fileNameLineEdit->text(), this->si->getToken());
 
 
 }
-void MainWindow::updateProgress(qint64 read, qint64 total){
-    ui->downloadProgress->setMaximum(1073741824);
+void MainWindow::updateProgress(qint64 read){
+
     ui->downloadProgress->setValue(read);
 }
 
@@ -218,4 +187,12 @@ void MainWindow::on_uploadButton_clicked()
 //    qDebug() << "Data: " << uploadFileName;
 //    qDebug() << "From parent thread MainWindow::on_uploadButton_clicked(): "<< QThread::currentThreadId();
     this->si->uploadFile(uploadFileName);
+}
+
+void MainWindow::on_fileList_itemClicked(QTreeWidgetItem *item)
+{
+    qDebug() <<"Setting fileName";
+    ui->fileNameLineEdit->setText(item->text(0));
+    qDebug() << "FileSize: " << item->text(1);
+    ui->downloadProgress->setMaximum(item->text(1).toInt());
 }

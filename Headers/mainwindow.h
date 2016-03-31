@@ -6,6 +6,8 @@
 #include <QNetworkReply>
 #include <QStringListModel>
 #include <QStandardItemModel>
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
 
 
 namespace Ui {
@@ -36,17 +38,17 @@ private slots:
 
      void doDownload();
 
-     void updateProgress(qint64, qint64);
+     void updateProgress(qint64);
 
      void on_fileChooseButton_clicked();
-
-     void on_fileList_clicked(const QModelIndex &index);
 
 //     void on_pushButton_clicked();
 
      void on_downloadFileButton_clicked();
 
      void on_uploadButton_clicked();
+
+     void on_fileList_itemClicked(QTreeWidgetItem *item);
 
 private:
     Ui::MainWindow *ui;
