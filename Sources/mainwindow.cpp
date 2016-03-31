@@ -191,8 +191,8 @@ void MainWindow::on_uploadButton_clicked()
 
 void MainWindow::on_fileList_itemClicked(QTreeWidgetItem *item)
 {
-    qDebug() <<"Setting fileName";
+    qDebug() <<"Setting fileName" << item->text(0);
     ui->fileNameLineEdit->setText(item->text(0));
-    qDebug() << "FileSize: " << item->text(1);
-    ui->downloadProgress->setMaximum(item->text(1).toInt());
+    qDebug() << "Setting FileSize: " << item->text(1).toLongLong();
+    ui->downloadProgress->setMaximum(item->text(1).toLongLong());
 }
