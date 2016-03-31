@@ -30,7 +30,7 @@
        <bool>true</bool>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="login">
        <property name="styleSheet">
@@ -307,7 +307,7 @@ QTreeView::item:selected:!active {
             <item row="1" column="0" colspan="2">
              <layout class="QHBoxLayout" name="horizontalLayout_4">
               <item>
-               <widget class="QLabel" name="label_2">
+               <widget class="QLabel" name="usernameLabel">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
                   <horstretch>0</horstretch>
@@ -320,7 +320,14 @@ QTreeView::item:selected:!active {
                </widget>
               </item>
               <item>
-               <widget class="QComboBox" name="comboBox"/>
+               <widget class="QComboBox" name="userList">
+                <property name="editable">
+                 <bool>false</bool>
+                </property>
+                <property name="currentText">
+                 <string/>
+                </property>
+               </widget>
               </item>
               <item>
                <widget class="QPushButton" name="getFileButton">

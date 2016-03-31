@@ -112,6 +112,7 @@ void ServerInterface::handleLogin(QString email, QString password){
         manager->post(request, postData);
 
         connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
+        this->userEmail = email;
 
 
 }
@@ -186,6 +187,9 @@ void ServerInterface::sendFile(QString filename){
 QString ServerInterface::getToken(){
     return this->token;
 }
+QString ServerInterface::getUserEmail(){
+    return this->userEmail;
+}
 
 
 void ServerInterface::uploadReplyFinished()
@@ -221,6 +225,34 @@ bool ServerInterface::isServerContactable(){
     QHostAddress serverAddress("127.0.0.1");
     socketToServer.connectToHost(serverAddress, 8080);
     return socketToServer.waitForConnected(2000); //waits 2 seconds...
+}
+
+void ServerInterface::getSubordiantes(){
+    QNetworkAccessManager *manager = new QNetworkAccessManager();
+
+        QUrl url("http://localhost:8080/getDirectSubordinates");
+        QNetworkRequest request(url);
+
+        request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
+
+        QByteArray postData;
+        postData.append("token=" + this->token);
+        postData.append("&userEmail=" + this->userEmail);
+
+        manager->post(request, postData);
+
+        connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(getSubordiantesFinished(QNetworkReply*)));
+}
+
+void ServerInterface::getSubordiantesFinished(QNetworkReply *reply)
+{
+    QString data = reply->readAll();
+        if(data.isNull() || data.isEmpty()){
+            throw "ServerInterface::replyFinished has received null or empty data.";
+        } else{
+
+            emit getSubordiantesSignal(data);
+        }
 }
 
 

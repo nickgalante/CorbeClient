@@ -40,6 +40,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     on_getFileButton_clicked();
 
+    connect(this->si, SIGNAL(getSubordiantesSignal(QString)),this,SLOT(fillDropdown(QString)));
+
+
 
 }
 
@@ -72,9 +75,12 @@ void MainWindow::displayMessage(QString msg){
         ui->stackedWidget->setCurrentIndex(1);
         ui->tabWidget->setCurrentIndex(0);
         ui->tabStatusLabel->setText(msg);
+
+        si->getSubordiantes();
     }
     else{
         ui->statusLabel->setText("Invalid email or password");
+
     }
 }
 
@@ -195,4 +201,19 @@ void MainWindow::on_fileList_itemClicked(QTreeWidgetItem *item)
     ui->fileNameLineEdit->setText(item->text(0));
     qDebug() << "Setting FileSize: " << item->text(1).toLongLong();
     ui->downloadProgress->setMaximum(item->text(1).toLongLong());
+}
+
+void MainWindow::fillDropdown(QString msg){
+    ui->userList->addItem(si->getUserEmail());
+
+    QJsonDocument jsonResponse = QJsonDocument::fromJson(msg.toUtf8());
+    QJsonArray jsonArray = jsonResponse.array();
+
+    foreach (const QJsonValue & value, jsonArray) {
+        QJsonObject obj = value.toObject();
+        ui->userList->addItem(obj["uuid"].toString());
+    }
+
+
+
 }

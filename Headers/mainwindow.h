@@ -50,6 +50,8 @@ private slots:
 
      void on_fileList_itemClicked(QTreeWidgetItem *item);
 
+     void fillDropdown(QString msg);
+
 private:
     Ui::MainWindow *ui;
     QStandardItemModel *model;
