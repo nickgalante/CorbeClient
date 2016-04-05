@@ -28,13 +28,13 @@ public:
 private slots:
      void handleLogin();
      //void replyFinished(QNetworkReply*);
-     void requestReceived(QNetworkReply*);
+     //void requestReceived(QNetworkReply*);
      void displayMessage(QString msg);
      void displayServerIsNotContactable();
 
      void on_backToLogin_clicked();
 
-     void on_getFileButton_clicked();
+     void on_getFileListButton_clicked();
 
      void doDownload();
 
@@ -51,6 +51,13 @@ private slots:
      void on_fileList_itemClicked(QTreeWidgetItem *item);
 
      void fillDropdown(QString msg);
+
+     void updateUploadProgress(qint64);
+
+     void fillFileList(QString msg);
+
+
+     void on_deleteFileButton_clicked();
 
 private:
     Ui::MainWindow *ui;

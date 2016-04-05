@@ -27,19 +27,26 @@ public:
     QString getUserEmail();
     bool isServerContactable();
     void getSubordiantes();
+    void deleteFile(QString fileName, QString token);
+    void getUserFileList(QString user);
 
 public slots:
    void replyFinished(QNetworkReply*);
    void uploadReplyFinished(); //when the upload is complete do this
    //void downloadFinished(QNetworkReply*);
    void updateDownloadProgress(qint64 read, qint64 total);
+    void updateUploadProgress(qint64 read, qint64 total);
    void getSubordiantesFinished(QNetworkReply*);
    //void httpReadyRead();
+   void deleteFinished(QNetworkReply *rep);
+   void userFileListResponse(QNetworkReply *reply);
 
 signals:
    void loginSignal(QString msg);
    void progressSignal(qint64 read, qint64 total);
+   void uploadProgressSignal(qint64 read, qint64 total);
    void getSubordiantesSignal(QString msg);
+   void userFileListSignal(QString msg);
 
 private:
    QString token;
@@ -47,6 +54,11 @@ private:
    QNetworkReply *reply;
    QFile *file;
    QString userEmail;
+
+
+public:
+   QString fileSize;
+
 };
 
 #endif // SERVERINTERFACE_H

@@ -138,6 +138,8 @@ void ServerInterface::replyFinished(QNetworkReply *reply)
 //void ServerInterface::sendFile(QString userid, QString filename, QString filelocation)
 void ServerInterface::sendFile(QString filename){
 
+    //connect(this->reply, SIGNAL(uploadProgress(qint64, qint64)), this, SLOT(updateUploadProgress(qint64, qint64)));
+
 
     QNetworkAccessManager *manager = new QNetworkAccessManager();
     QUrl url("http://localhost:8080/encrypt");
@@ -207,6 +209,8 @@ void ServerInterface::uploadReplyFinished()
 //MIGHT NEED TO STORE THE UPLOADWORKER* AS A GLOBAL/EXTERNAL VARIABLE
 void ServerInterface::uploadFile(QString fileNameAndDirectory){
 
+    //connect(this->reply, SIGNAL(uploadProgress(qint64, qint64)), this, SLOT(updateUploadProgress(qint64, qint64)));
+
     qDebug() << "ServerInterface::uploadFile(QString fileNameAndDirectory) fileNameAndDirectory: " << fileNameAndDirectory;
     qDebug() << "ServerInterface::uploadFile(QString fileNameAndDirectory) token: " << this->token;
     qDebug() << "ServerInterface::uploadFile(QString fileNameAndDirectory) making the upload worker";
@@ -219,6 +223,11 @@ void ServerInterface::uploadFile(QString fileNameAndDirectory){
     qDebug() << "ServerInterface::uploadFile(QString fileNameAndDirectory) already started";
 }
 
+void ServerInterface::updateUploadProgress(qint64 read, qint64 total)
+{
+    qDebug()<< "upload" << read << total;
+    emit uploadProgressSignal(read, total);
+}
 
 bool ServerInterface::isServerContactable(){
     QTcpSocket socketToServer;
@@ -246,12 +255,60 @@ void ServerInterface::getSubordiantes(){
 
 void ServerInterface::getSubordiantesFinished(QNetworkReply *reply)
 {
+
     QString data = reply->readAll();
-        if(data.isNull() || data.isEmpty()){
+    if(data.isNull() || data.isEmpty()){
             throw "ServerInterface::replyFinished has received null or empty data.";
         } else{
 
             emit getSubordiantesSignal(data);
+        }
+}
+
+void ServerInterface::deleteFile(QString fileName, QString token){
+    //create the usual crap
+    QNetworkAccessManager *manager = new QNetworkAccessManager();
+    QNetworkRequest req(QUrl("http://localhost:8080/deleteFile"));
+
+    this->token = token;
+    this->fileName = fileName;
+
+    QByteArray postData;
+    postData.append("token=" + this->token + "&");
+    postData.append("fileName=" + this->fileName);
+
+    this->reply = manager->post(req, postData);
+
+    connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(deleteFinished(QNetworkReply*)));
+
+}
+
+void ServerInterface::deleteFinished(QNetworkReply *rep)
+{
+    qDebug() << "File Successfully Deleted";
+}
+
+void ServerInterface::getUserFileList(QString user){
+    qDebug() <<"User File List for: " << user;
+    QNetworkAccessManager *manager = new QNetworkAccessManager(this);
+    connect(manager,SIGNAL(finished(QNetworkReply*)),this,SLOT(userFileListResponse(QNetworkReply*)));
+    QNetworkRequest req(QUrl("http://localhost:8080/UserFileList"));
+
+    QByteArray postData;
+    postData.append("email=" + user);
+
+    this->reply = manager->post(req, postData);
+
+
+}
+
+void ServerInterface::userFileListResponse(QNetworkReply *reply){
+    QString data = reply->readAll();
+    if(data.isNull() || data.isEmpty()){
+            throw "ServerInterface::UserFileListResponse has received null or empty data.";
+        } else{
+
+            emit userFileListSignal(data);
         }
 }
 

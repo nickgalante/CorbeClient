@@ -38,9 +38,11 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->cancelButton, SIGNAL(clicked()),this, SLOT());
     QObject::connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(on_backToLogin_clicked()));
 
-    on_getFileButton_clicked();
+    //on_getFileButton_clicked();
 
     connect(this->si, SIGNAL(getSubordiantesSignal(QString)),this,SLOT(fillDropdown(QString)));
+    connect(this->si, SIGNAL(loginSignal(QString)),this,SLOT(displayMessage(QString)));
+    connect(this->si, SIGNAL(userFileListSignal(QString)),this,SLOT(fillFileList(QString)));
 
 
 
@@ -59,7 +61,7 @@ void MainWindow::handleLogin(){
         displayServerIsNotContactable();
     } else{
         //    ServerInterface *si = new ServerInterface();
-            connect(this->si, SIGNAL(loginSignal(QString)),this,SLOT(displayMessage(QString)));
+            //connect(this->si, SIGNAL(loginSignal(QString)),this,SLOT(displayMessage(QString)));
 
 
             QString enteredEmail = ui->email->text();
@@ -76,7 +78,7 @@ void MainWindow::displayMessage(QString msg){
         ui->tabWidget->setCurrentIndex(0);
         ui->tabStatusLabel->setText(msg);
 
-        si->getSubordiantes();
+        this->si->getSubordiantes();
     }
     else{
         ui->statusLabel->setText("Invalid email or password");
@@ -99,50 +101,37 @@ void MainWindow::on_backToLogin_clicked()
 
 
 
-void MainWindow::on_getFileButton_clicked()
+void MainWindow::on_getFileListButton_clicked()
 {
-    QNetworkAccessManager *manager = new QNetworkAccessManager(this);
-        connect(manager,SIGNAL(finished(QNetworkReply*)),this,SLOT(requestReceived(QNetworkReply*)));
-    manager->get(QNetworkRequest(QUrl("http://localhost:8080/UserFileList?email=ceo@test.com")));
-
+    si->getUserFileList(ui->userList->currentText());
 }
 
-void MainWindow::requestReceived(QNetworkReply* reply){
-
+void MainWindow::fillFileList(QString msg){
 
     ui->fileList->clear();
     ui->fileList->setColumnCount(2);
     ui->fileList->setHeaderLabels(QStringList() << "File Name" << "Size");
 
-    QString data = reply->readAll();
+    QJsonDocument jsonResponse = QJsonDocument::fromJson(msg.toUtf8());
+    QJsonObject jsonObj = jsonResponse.object();
 
-        QJsonDocument jsonResponse = QJsonDocument::fromJson(data.toUtf8());
-        QJsonObject jsonObj = jsonResponse.object();
+    QJsonObject fileObj = jsonObj["userFileMap"].toObject();
+    //qDebug() << fileObj;
 
-        QJsonObject fileObj = jsonObj["userFileMap"].toObject();
-        qDebug() << fileObj;
+    QJsonObject::iterator it;
+    for (it = fileObj.begin(); it != fileObj.end(); it++) {
+        QString key = it.key();
+        qlonglong value = it.value().toVariant().toLongLong();
 
-        QJsonObject::iterator it;
-        for (it = fileObj.begin(); it != fileObj.end(); it++) {
-               QString key = it.key();
-               qlonglong value = it.value().toVariant().toLongLong();
+        QTreeWidgetItem *treeItem = new QTreeWidgetItem(ui->fileList);
 
-               QTreeWidgetItem *treeItem = new QTreeWidgetItem(ui->fileList);
+        treeItem->setText(0, key);
+        treeItem->setText(1, QString::number(value));
 
-                   // QTreeWidgetItem::setText(int column, const QString & text)
-                   treeItem->setText(0, key);
-                   treeItem->setText(1, QString::number(value));
+    }
 
-
-
-
-               //ui->fileList->setItem(ui->fileList->rowCount()-1, 0, new QTableWidgetItem(key));
-               //ui->fileList->setItem(ui->fileList->rowCount()-1, 1, new QTableWidgetItem(QString::number(value)));
-
-           }
-
-        ui->fileList->header()->setStretchLastSection(true);
-         ui->fileList->setAlternatingRowColors(true);
+    ui->fileList->header()->setStretchLastSection(true);
+    ui->fileList->setAlternatingRowColors(true);
 }
 
 
@@ -155,7 +144,6 @@ void MainWindow::on_downloadFileButton_clicked()
 void MainWindow::doDownload(){
     qDebug() << "Getting file";
     ui->downloadProgress->setValue(0);
-//    ServerInterface *si = new ServerInterface();
     connect(this->si, SIGNAL(progressSignal(qint64, qint64)), this, SLOT(updateProgress(qint64)));
     si->getFile(ui->fileNameLineEdit->text(), this->si->getToken());
 
@@ -163,7 +151,12 @@ void MainWindow::doDownload(){
 }
 void MainWindow::updateProgress(qint64 read){
 
-    ui->downloadProgress->setValue(read);
+    ui->downloadProgress->setMaximum(100);
+    qint64 value = (read/(si->fileSize.toDouble())*100);
+    QString percent = QString::number(value);
+    ui->downloadProgress->setValue(value);
+    qDebug() << "percent" << percent;
+    ui->progressPrecent->setText(percent + "%");
 }
 
 
@@ -190,8 +183,8 @@ void MainWindow::on_fileChooseButton_clicked()
 void MainWindow::on_uploadButton_clicked()
 {
     QString uploadFileName = this->ui->uploadFileLineEdit->text();
-//    qDebug() << "Data: " << uploadFileName;
-//    qDebug() << "From parent thread MainWindow::on_uploadButton_clicked(): "<< QThread::currentThreadId();
+
+    connect(this->si, SIGNAL(uploadProgressSignal(qint64, qint64)), this, SLOT(updateUploadProgress(qint64)));
     this->si->uploadFile(uploadFileName);
 }
 
@@ -200,10 +193,12 @@ void MainWindow::on_fileList_itemClicked(QTreeWidgetItem *item)
     qDebug() <<"Setting fileName" << item->text(0);
     ui->fileNameLineEdit->setText(item->text(0));
     qDebug() << "Setting FileSize: " << item->text(1).toLongLong();
-    ui->downloadProgress->setMaximum(item->text(1).toLongLong());
+    //ui->downloadProgress->setMaximum(item->text(1).toLongLong());
+    si->fileSize = item->text(1);
 }
 
 void MainWindow::fillDropdown(QString msg){
+    ui->userList->clear();
     ui->userList->addItem(si->getUserEmail());
 
     QJsonDocument jsonResponse = QJsonDocument::fromJson(msg.toUtf8());
@@ -211,9 +206,22 @@ void MainWindow::fillDropdown(QString msg){
 
     foreach (const QJsonValue & value, jsonArray) {
         QJsonObject obj = value.toObject();
-        ui->userList->addItem(obj["uuid"].toString());
+        ui->userList->addItem(obj["email"].toString());
     }
 
 
 
+}
+void MainWindow::updateUploadProgress(qint64 read){
+    ui->uploadProgress->setMaximum(100);
+    qint64 value = (read/(si->fileSize.toDouble())*100);
+    QString percent = QString::number(value);
+    ui->uploadProgress->setValue(value);
+    qDebug() << "percent" << percent;
+    //ui->progressPrecent->setText(percent + "%");
+}
+
+void MainWindow::on_deleteFileButton_clicked()
+{
+    si->deleteFile(ui->fileNameLineEdit->text(), this->si->getToken());
 }
