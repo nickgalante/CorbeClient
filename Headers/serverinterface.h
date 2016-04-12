@@ -29,6 +29,7 @@ public:
     void getSubordiantes();
     void deleteFile(QString fileName, QString token);
     void getUserFileList(QString user);
+    void insertNewUser(QString email, QString firstName, QString lastName, QString department, QString superior, QString password);
 
 public slots:
    void replyFinished(QNetworkReply*);
@@ -40,6 +41,8 @@ public slots:
    //void httpReadyRead();
    void deleteFinished(QNetworkReply *rep);
    void userFileListResponse(QNetworkReply *reply);
+   void downloadStatus(QString msg);
+   void insertFinished(QNetworkReply* reply);
 
 signals:
    void loginSignal(QString msg);
@@ -47,17 +50,19 @@ signals:
    void uploadProgressSignal(qint64 read, qint64 total);
    void getSubordiantesSignal(QString msg);
    void userFileListSignal(QString msg);
+   void downloadStatusSignal(QString msg);
 
 private:
    QString token;
    QString fileName;
    QNetworkReply *reply;
    QFile *file;
-   QString userEmail;
+
 
 
 public:
    QString fileSize;
+   QString userEmail;
 
 };
 

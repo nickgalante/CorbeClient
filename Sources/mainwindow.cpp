@@ -43,6 +43,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this->si, SIGNAL(getSubordiantesSignal(QString)),this,SLOT(fillDropdown(QString)));
     connect(this->si, SIGNAL(loginSignal(QString)),this,SLOT(displayMessage(QString)));
     connect(this->si, SIGNAL(userFileListSignal(QString)),this,SLOT(fillFileList(QString)));
+    connect(this->si, SIGNAL(downloadStatusSignal(QString)),this,SLOT(displayDownloadStatus(QString)));
 
 
 
@@ -55,19 +56,14 @@ MainWindow::~MainWindow()
 
 void MainWindow::handleLogin(){
 
-    //this->si = new ServerInterface();
-
     if(! this->si->isServerContactable()){
         displayServerIsNotContactable();
     } else{
-        //    ServerInterface *si = new ServerInterface();
-            //connect(this->si, SIGNAL(loginSignal(QString)),this,SLOT(displayMessage(QString)));
 
+        QString enteredEmail = ui->email->text();
+        QString enterPassword = ui->password->text();
 
-            QString enteredEmail = ui->email->text();
-            QString enterPassword = ui->password->text();
-
-            this->si->handleLogin(enteredEmail, enterPassword);
+        this->si->handleLogin(enteredEmail, enterPassword);
     }
 }
 
@@ -79,6 +75,7 @@ void MainWindow::displayMessage(QString msg){
         ui->tabStatusLabel->setText(msg);
 
         this->si->getSubordiantes();
+        this->si->getUserFileList(si->userEmail);
     }
     else{
         ui->statusLabel->setText("Invalid email or password");
@@ -93,7 +90,7 @@ void MainWindow::displayServerIsNotContactable(){
 
 void MainWindow::on_backToLogin_clicked()
 {
-    if(ui->tabWidget->currentIndex()==3){
+    if(ui->tabWidget->currentIndex()==4){
 
             ui->stackedWidget->setCurrentIndex(0);
         }
@@ -137,6 +134,7 @@ void MainWindow::fillFileList(QString msg){
 
 void MainWindow::on_downloadFileButton_clicked()
 {
+    ui->downloadStatus->clear();
     doDownload();
 }
 
@@ -157,6 +155,11 @@ void MainWindow::updateProgress(qint64 read){
     ui->downloadProgress->setValue(value);
     qDebug() << "percent" << percent;
     ui->progressPrecent->setText(percent + "%");
+}
+
+void MainWindow::displayDownloadStatus(QString status){
+    qDebug() <<"setting downloadStatus text" << status;
+     ui->downloadStatus->setText(status);
 }
 
 
@@ -200,6 +203,7 @@ void MainWindow::on_fileList_itemClicked(QTreeWidgetItem *item)
 void MainWindow::fillDropdown(QString msg){
     ui->userList->clear();
     ui->userList->addItem(si->getUserEmail());
+    ui->newUserSuperior->addItem(si->getUserEmail());
 
     QJsonDocument jsonResponse = QJsonDocument::fromJson(msg.toUtf8());
     QJsonArray jsonArray = jsonResponse.array();
@@ -207,6 +211,8 @@ void MainWindow::fillDropdown(QString msg){
     foreach (const QJsonValue & value, jsonArray) {
         QJsonObject obj = value.toObject();
         ui->userList->addItem(obj["email"].toString());
+        ui->newUserSuperior->addItem(obj["email"].toString());
+        //ui->ListOfSubordinates->addItem(obj["email"].toString());
     }
 
 
@@ -224,4 +230,17 @@ void MainWindow::updateUploadProgress(qint64 read){
 void MainWindow::on_deleteFileButton_clicked()
 {
     si->deleteFile(ui->fileNameLineEdit->text(), this->si->getToken());
+}
+
+
+void MainWindow::on_insertUserButton_clicked()
+{
+    QString email = ui->newUserEmail->text();
+    QString firstName = ui->newUserFirstName->text();
+    QString lastName = ui->newUserLastName->text();
+    QString department = ui->newUserDepartment->text();
+    QString superior = ui->newUserSuperior->currentText();
+    QString password = ui->newUserPassword->text();
+
+    si->insertNewUser(email, firstName, lastName, department, superior, password);
 }

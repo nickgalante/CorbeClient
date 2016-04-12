@@ -25,6 +25,9 @@ private slots:
     void onHttpReadyRead();
     void downloadFinished(QNetworkReply *rep);
 
+signals:
+    void invalidTokenSignal(QString msg);
+
 };
 
 

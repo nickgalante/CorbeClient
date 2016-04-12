@@ -55,17 +55,17 @@ bool ServerInterface::getFile() {
 }
 
 bool ServerInterface::getFile(QString fileName, QString token) {
-
    //create the usual crap
    QNetworkAccessManager *manager = new QNetworkAccessManager();
    QNetworkRequest req(QUrl("http://localhost:8080/decrypt"));
+   req.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
 
    //Create a new thread,a new dw worker, connect them all, and fire off the damn thing
    this->token = token;
    this->fileName = fileName;
    QString downloadToDirectory = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation) + "/";
    qDebug() << "Writing " << fileName << " to " << downloadToDirectory;
-
+    qDebug() << this->token << this->fileName;
    QByteArray postData;
    postData.append("token=" + this->token + "&");
    postData.append("fileName=" + this->fileName);
@@ -82,17 +82,25 @@ bool ServerInterface::getFile(QString fileName, QString token) {
    t->start();
 
    connect(manager, SIGNAL(finished(QNetworkReply*)), dw, SLOT(downloadFinished(QNetworkReply*)));
+   //connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(downloadStatus(QNetworkReply*)));
+   connect(dw, SIGNAL(invalidTokenSignal(QString)), this, SLOT(downloadStatus(QString)));
    connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(updateDownloadProgress(qint64, qint64)));
 
    return true;
 }
 
 
-
 void ServerInterface::updateDownloadProgress(qint64 read, qint64 total)
 {
     qDebug() << read << total;
     emit progressSignal(read, total);
+}
+
+void ServerInterface::downloadStatus(QString msg){
+    qDebug() <<"calling downloadStatus";
+    qDebug() << "response" << msg;
+    emit downloadStatusSignal(msg);
+
 }
 
 
@@ -310,6 +318,28 @@ void ServerInterface::userFileListResponse(QNetworkReply *reply){
 
             emit userFileListSignal(data);
         }
+}
+
+void ServerInterface::insertNewUser(QString email, QString firstName, QString lastName, QString department, QString superior, QString password){
+    QNetworkAccessManager *manager = new QNetworkAccessManager();
+    QNetworkRequest req(QUrl("http://localhost:8080/insertNewUser"));
+
+    QByteArray postData;
+    postData.append("token=" + this->token + "&");
+    postData.append("newUserEmail=" + email + "&");
+    postData.append("newUserFirstName=" + firstName + "&");
+    postData.append("newUserLastName=" + lastName + "&");
+    postData.append("newUserDepartment=" + department + "&");
+    postData.append("newUserSuperiorEmail=" + superior + "&");
+    postData.append("newUserPassword=" + password);
+
+    this->reply = manager->post(req, postData);
+
+    connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(insertFinished(QNetworkReply*)));
+}
+
+void ServerInterface::insertFinished(QNetworkReply* reply){
+    qDebug() << "User inserted " << reply->readAll();
 }
 
 
