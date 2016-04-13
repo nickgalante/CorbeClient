@@ -30,6 +30,7 @@ public:
     void deleteFile(QString fileName, QString token);
     void getUserFileList(QString user);
     void insertNewUser(QString email, QString firstName, QString lastName, QString department, QString superior, QString password);
+    void removeUser(QString email);
 
 public slots:
    void replyFinished(QNetworkReply*);
@@ -43,6 +44,7 @@ public slots:
    void userFileListResponse(QNetworkReply *reply);
    void downloadStatus(QString msg);
    void insertFinished(QNetworkReply* reply);
+   void removeFinished(QNetworkReply* reply);
 
 signals:
    void loginSignal(QString msg);

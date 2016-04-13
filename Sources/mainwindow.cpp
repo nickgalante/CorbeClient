@@ -204,6 +204,7 @@ void MainWindow::fillDropdown(QString msg){
     ui->userList->clear();
     ui->userList->addItem(si->getUserEmail());
     ui->newUserSuperior->addItem(si->getUserEmail());
+    ui->userToRemove->addItem(si->getUserEmail());
 
     QJsonDocument jsonResponse = QJsonDocument::fromJson(msg.toUtf8());
     QJsonArray jsonArray = jsonResponse.array();
@@ -212,6 +213,7 @@ void MainWindow::fillDropdown(QString msg){
         QJsonObject obj = value.toObject();
         ui->userList->addItem(obj["email"].toString());
         ui->newUserSuperior->addItem(obj["email"].toString());
+        ui->userToRemove->addItem(obj["email"].toString());
         //ui->ListOfSubordinates->addItem(obj["email"].toString());
     }
 
@@ -243,4 +245,11 @@ void MainWindow::on_insertUserButton_clicked()
     QString password = ui->newUserPassword->text();
 
     si->insertNewUser(email, firstName, lastName, department, superior, password);
+}
+
+void MainWindow::on_removeUserButton_clicked()
+{
+    QString email = ui->userToRemove->currentText();
+
+    si->removeUser(email);
 }

@@ -63,6 +63,8 @@ private slots:
 
      void on_insertUserButton_clicked();
 
+     void on_removeUserButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     QStandardItemModel *model;
