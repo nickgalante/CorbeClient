@@ -16,6 +16,8 @@
 #include <QUrlQuery>
 #include <QNetworkReply>
 #include <QDebug>
+#include <QSslKey>
+#include <QSslConfiguration>
 #include <QStandardPaths>
 #include <QString>
 #include <QProgressBar>
@@ -30,7 +32,8 @@ bool ServerInterface::getFile() {
 
    //create the usual crap
    QNetworkAccessManager *manager = new QNetworkAccessManager();
-   QNetworkRequest req(QUrl("http://localhost:8080/returnFile"));
+   QNetworkRequest req(QUrl("https://localhost:8443/returnFile"));
+   req.setSslConfiguration(*this->sslConfig);
 
    //Create a new thread,a new dw worker, connect them all, and fire off the damn thing
    QString token = "";
@@ -40,7 +43,7 @@ bool ServerInterface::getFile() {
    this->reply = manager->get(req);
    QThread *t = new QThread();
    qDebug() << "In ServerInterface::getFile() << about to call the Download Worker constructor";
-   DownloadWorker* dw = new DownloadWorker(token, fileName, downloadToDirectory, this->reply);
+   DownloadWorker* dw = new DownloadWorker(token, fileName, downloadToDirectory, this->reply, this->sslConfig);
    connect(this->reply, SIGNAL(readyRead()), dw, SLOT(onHttpReadyRead()));
 
    manager->moveToThread(t);
@@ -57,7 +60,8 @@ bool ServerInterface::getFile() {
 bool ServerInterface::getFile(QString fileName, QString token) {
    //create the usual crap
    QNetworkAccessManager *manager = new QNetworkAccessManager();
-   QNetworkRequest req(QUrl("http://localhost:8080/decrypt"));
+   QNetworkRequest req(QUrl("https://localhost:8443/decrypt"));
+   req.setSslConfiguration(*this->sslConfig);
    req.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
 
    //Create a new thread,a new dw worker, connect them all, and fire off the damn thing
@@ -73,7 +77,7 @@ bool ServerInterface::getFile(QString fileName, QString token) {
    this->reply = manager->post(req, postData);
    QThread *t = new QThread();
    qDebug() << "In ServerInterface::getFile() << about to call the Download Worker constructor";
-   DownloadWorker* dw = new DownloadWorker(this->token, this->fileName, downloadToDirectory, this->reply);
+   DownloadWorker* dw = new DownloadWorker(this->token, this->fileName, downloadToDirectory, this->reply, this->sslConfig);
    connect(this->reply, SIGNAL(readyRead()), dw, SLOT(onHttpReadyRead()));
 
    manager->moveToThread(t);
@@ -103,14 +107,20 @@ void ServerInterface::downloadStatus(QString msg){
 
 }
 
-
+/**
+ * @brief ServerInterface::handleLogin Establishes ssl and handles login
+ * @param email
+ * @param password
+ */
 void ServerInterface::handleLogin(QString email, QString password){
+
+    this->establishSslConfig();
 
     QNetworkAccessManager *manager = new QNetworkAccessManager();
 
-        QUrl url("http://localhost:8080/signin");
+        QUrl url("https://localhost:8443/signin");
         QNetworkRequest request(url);
-
+        request.setSslConfiguration(*this->sslConfig);
         request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
 
         QByteArray postData;
@@ -150,8 +160,9 @@ void ServerInterface::sendFile(QString filename){
 
 
     QNetworkAccessManager *manager = new QNetworkAccessManager();
-    QUrl url("http://localhost:8080/encrypt");
+    QUrl url("https://localhost:8443/encrypt");
     QNetworkRequest request(url);
+    request.setSslConfiguration(*this->sslConfig);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
     request.setRawHeader("token", this->token.toUtf8());
     request.setRawHeader("fileName", filename.toUtf8());
@@ -222,7 +233,7 @@ void ServerInterface::uploadFile(QString fileNameAndDirectory){
     qDebug() << "ServerInterface::uploadFile(QString fileNameAndDirectory) fileNameAndDirectory: " << fileNameAndDirectory;
     qDebug() << "ServerInterface::uploadFile(QString fileNameAndDirectory) token: " << this->token;
     qDebug() << "ServerInterface::uploadFile(QString fileNameAndDirectory) making the upload worker";
-    UploadWorker* uploadWorker = new UploadWorker(this->token, fileNameAndDirectory);
+    UploadWorker* uploadWorker = new UploadWorker(this->token, fileNameAndDirectory, this->sslConfig);
     QThread* t = new QThread();
     uploadWorker->moveToThread(t);
     uploadWorker->run();
@@ -237,19 +248,21 @@ void ServerInterface::updateUploadProgress(qint64 read, qint64 total)
     emit uploadProgressSignal(read, total);
 }
 
+//disabled for now
 bool ServerInterface::isServerContactable(){
-    QTcpSocket socketToServer;
-    QHostAddress serverAddress("127.0.0.1");
-    socketToServer.connectToHost(serverAddress, 8080);
-    return socketToServer.waitForConnected(2000); //waits 2 seconds...
+//    QTcpSocket socketToServer;
+//    QHostAddress serverAddress("127.0.0.1");
+//    socketToServer.connectToHost(serverAddress, 8080);
+//    return socketToServer.waitForConnected(2000); //waits 2 seconds...
+    return true;
 }
 
 void ServerInterface::getSubordiantes(){
     QNetworkAccessManager *manager = new QNetworkAccessManager();
 
-        QUrl url("http://localhost:8080/getDirectSubordinates");
+        QUrl url("https://localhost:8443/getDirectSubordinates");
         QNetworkRequest request(url);
-
+        request.setSslConfiguration(*this->sslConfig);
         request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
 
         QByteArray postData;
@@ -276,7 +289,8 @@ void ServerInterface::getSubordiantesFinished(QNetworkReply *reply)
 void ServerInterface::deleteFile(QString fileName, QString token){
     //create the usual crap
     QNetworkAccessManager *manager = new QNetworkAccessManager();
-    QNetworkRequest req(QUrl("http://localhost:8080/deleteFile"));
+    QNetworkRequest req(QUrl("https://localhost:8443/deleteFile"));
+    req.setSslConfiguration(*this->sslConfig);
 
     this->token = token;
     this->fileName = fileName;
@@ -300,7 +314,8 @@ void ServerInterface::getUserFileList(QString user){
     qDebug() <<"User File List for: " << user;
     QNetworkAccessManager *manager = new QNetworkAccessManager(this);
     connect(manager,SIGNAL(finished(QNetworkReply*)),this,SLOT(userFileListResponse(QNetworkReply*)));
-    QNetworkRequest req(QUrl("http://localhost:8080/UserFileList"));
+    QNetworkRequest req(QUrl("https://localhost:8443/UserFileList"));
+    req.setSslConfiguration(*this->sslConfig);
 
     QByteArray postData;
     postData.append("email=" + user);
@@ -322,7 +337,8 @@ void ServerInterface::userFileListResponse(QNetworkReply *reply){
 
 void ServerInterface::insertNewUser(QString email, QString firstName, QString lastName, QString department, QString superior, QString password){
     QNetworkAccessManager *manager = new QNetworkAccessManager();
-    QNetworkRequest req(QUrl("http://localhost:8080/insertNewUser"));
+    QNetworkRequest req(QUrl("https://localhost:8443/insertNewUser"));
+    req.setSslConfiguration(*this->sslConfig);
 
     QByteArray postData;
     postData.append("token=" + this->token + "&");
@@ -344,7 +360,8 @@ void ServerInterface::insertFinished(QNetworkReply* reply){
 
 void ServerInterface::removeUser(QString email){
     QNetworkAccessManager *manager = new QNetworkAccessManager();
-    QNetworkRequest req(QUrl("http://localhost:8080/removeUser"));
+    QNetworkRequest req(QUrl("https://localhost:8443/removeUser"));
+    req.setSslConfiguration(*this->sslConfig);
 
     QByteArray postData;
     postData.append("token=" + this->token + "&");
@@ -359,4 +376,16 @@ void ServerInterface::removeFinished(QNetworkReply* reply){
     qDebug() << "User removed" << reply->readAll();
 }
 
+void ServerInterface::establishSslConfig(){
 
+    QFile certLocation(":/ssl/Resources/CORBE_Cert_Distribute.der");
+    certLocation.open(QIODevice::ReadOnly);
+    QSslCertificate cert(&certLocation, QSsl::Der);
+
+    this->sslConfig = new QSslConfiguration();
+    QSslKey key(cert.toDer(), QSsl::Rsa, QSsl::Der, QSsl::PrivateKey);
+    sslConfig->setCaCertificates(QList<QSslCertificate>() << cert);
+    sslConfig->setPrivateKey(key);
+    sslConfig->setPeerVerifyMode(QSslSocket::QueryPeer);
+
+}

@@ -5,20 +5,22 @@
 #include <QFile>
 #include <QDebug>
 #include <QtNetwork/QNetworkAccessManager>
-#include <QNetworkRequest>
 #include <QUrlQuery>
 #include <QNetworkReply>
 #include <QDebug>
+#include <QSslConfiguration>
 #include <QString>
 #include <QProgressBar>
 
 
 
-DownloadWorker::DownloadWorker(QString token, QString fileName, QString downloadToDirectory, QNetworkReply* reply){
+DownloadWorker::DownloadWorker(QString token, QString fileName, QString downloadToDirectory,
+                               QNetworkReply* reply, QSslConfiguration *sslConfig){
     this->token = token;
     this->filename = fileName;
     this->downloadToDirectory = downloadToDirectory;
     this->reply = reply;
+    this->reply->setSslConfiguration(*sslConfig);
 
     this->fileToWriteTo = new QFile(downloadToDirectory + fileName);
     this->totalWrote = 0;

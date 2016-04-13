@@ -10,7 +10,8 @@ class DownloadWorker : public QObject{
     Q_OBJECT
 
 public:
-    DownloadWorker(QString token, QString filename, QString downloadToDirectory, QNetworkReply* reply);
+    DownloadWorker(QString token, QString filename, QString downloadToDirectory,
+                   QNetworkReply* reply, QSslConfiguration *sslConfig);
 
 private:
     QString token;

@@ -6,6 +6,7 @@
 #include <QString>
 #include <QUrl>
 #include <QNetworkRequest>
+#include <QSslConfiguration>
 #include <QThread>
 
 class UploadWorker : public QObject{
@@ -14,7 +15,7 @@ class UploadWorker : public QObject{
 
 
 public:
-    UploadWorker(QString, QString fileNameAndDirectory);
+    UploadWorker(QString, QString fileNameAndDirectory, QSslConfiguration *sslConfig);
     void run();
 
 public slots:
@@ -28,6 +29,7 @@ private:
 //    QNetworkAccessManager* manager;
     QNetworkRequest* request;
     QFile* fileToSend;
+    QSslConfiguration *sslConfig;
 
 
 

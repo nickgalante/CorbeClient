@@ -10,10 +10,11 @@
 
 #include <unistd.h> //sleep
 
-UploadWorker::UploadWorker(QString token, QString fileNameAndDirectory){
+UploadWorker::UploadWorker(QString token, QString fileNameAndDirectory, QSslConfiguration* sslConfig){
     this->token = token;
     this->fileNameAndDirectory = fileNameAndDirectory;
     this->bytesRead = 0;
+    this->sslConfig = sslConfig;
 
 //    this->manager = new QNetworkAccessManager();
 }
@@ -21,9 +22,10 @@ UploadWorker::UploadWorker(QString token, QString fileNameAndDirectory){
 void UploadWorker::run(){
 
     QNetworkAccessManager *manager = new QNetworkAccessManager();
-    QUrl url("http://localhost:8080/encrypt");
+    QUrl url("https://localhost:8443/encrypt");
 
     this->request = new QNetworkRequest(url);
+    this->request->setSslConfiguration(*this->sslConfig);
 
     this->fileToSend = new QFile(this->fileNameAndDirectory);
     if(!this->fileToSend->open(QIODevice::ReadOnly) || !this->fileToSend->isReadable()) {
