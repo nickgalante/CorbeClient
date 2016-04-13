@@ -342,5 +342,21 @@ void ServerInterface::insertFinished(QNetworkReply* reply){
     qDebug() << "User inserted " << reply->readAll();
 }
 
+void ServerInterface::removeUser(QString email){
+    QNetworkAccessManager *manager = new QNetworkAccessManager();
+    QNetworkRequest req(QUrl("http://localhost:8080/removeUser"));
+
+    QByteArray postData;
+    postData.append("token=" + this->token + "&");
+    postData.append("emailUserToRemove=" + email);
+
+    this->reply = manager->post(req, postData);
+
+    connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(removeFinished(QNetworkReply*)));
+}
+
+void ServerInterface::removeFinished(QNetworkReply* reply){
+    qDebug() << "User removed" << reply->readAll();
+}
 
 
