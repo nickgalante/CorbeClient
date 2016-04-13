@@ -6,6 +6,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
+#include <QSslConfiguration>
 #include <QString>
 #include <QProgressBar>
 #include <QFile>
@@ -59,7 +60,8 @@ private:
    QString fileName;
    QNetworkReply *reply;
    QFile *file;
-
+   QSslConfiguration *sslConfig;
+   void establishSslConfig();
 
 
 public:

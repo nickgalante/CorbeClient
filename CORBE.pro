@@ -33,3 +33,6 @@ test {
     include(Sources/Sources.pri)
     include(Headers/Headers.pri)
 }
+
+RESOURCES += \
+    resources.qrc

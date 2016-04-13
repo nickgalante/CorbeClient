@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/ssl">
+        <file>Resources/CORBE_Cert_Distribute.der</file>
+    </qresource>
+</RCC>
