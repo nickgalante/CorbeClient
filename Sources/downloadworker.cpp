@@ -35,18 +35,15 @@ DownloadWorker::DownloadWorker(QString token, QString fileName, QString download
 
 void DownloadWorker::onHttpReadyRead(){
 
-    QByteArray data;
-    QString response = data;
-    response = this->reply->readAll();
+    QByteArray response = this->reply->readAll();
+
+   /* if
     if(response.contains("invalid token", Qt::CaseInsensitive)){
         qDebug() << "Invalid Token";
         emit invalidTokenSignal(response);
-
     }
-    else if (this->fileToWriteTo->isWritable()){
-
-        //qDebug() << "data" << data;
-        this->totalWrote += this->fileToWriteTo->write(data);
+    else*/ if (this->fileToWriteTo->isWritable()){
+        this->totalWrote += this->fileToWriteTo->write(response);
         this->fileToWriteTo->seek(this->totalWrote);
         this->fileToWriteTo->flush();
     }
