@@ -44,6 +44,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this->si, SIGNAL(loginSignal(QString)),this,SLOT(displayMessage(QString)));
     connect(this->si, SIGNAL(userFileListSignal(QString)),this,SLOT(fillFileList(QString)));
     connect(this->si, SIGNAL(downloadStatusSignal(QString)),this,SLOT(displayDownloadStatus(QString)));
+    connect(this->si, SIGNAL(signoutSignal(QString)),this,SLOT(handleSignout(QString)));
 
 
 
@@ -69,13 +70,15 @@ void MainWindow::handleLogin(){
 
 void MainWindow::displayMessage(QString msg){
     if(msg.contains("success", Qt::CaseInsensitive)){
-        ui->statusLabel->setText(msg);
+        ui->statusLabel->setText("Welcome");
         ui->stackedWidget->setCurrentIndex(1);
         ui->tabWidget->setCurrentIndex(0);
-        ui->tabStatusLabel->setText(msg);
+
+        ui->welcomeLabel->setText("Welcome, " + si->userEmail);
 
         this->si->getSubordiantes();
         this->si->getUserFileList(si->userEmail);
+
     }
     else{
         ui->statusLabel->setText("Invalid email or password");
@@ -90,12 +93,17 @@ void MainWindow::displayServerIsNotContactable(){
 
 void MainWindow::on_backToLogin_clicked()
 {
-    if(ui->tabWidget->currentIndex()==4){
-
-            ui->stackedWidget->setCurrentIndex(0);
-        }
+    if(ui->tabWidget->currentIndex()==3){
+         ui->stackedWidget->setCurrentIndex(0);
+         si->signout();
+    }
 }
 
+void MainWindow::handleSignout(QString msg){
+    ui->statusLabel->setText("Logout Successful");
+    ui->welcomeLabel->setText("");
+
+}
 
 
 void MainWindow::on_getFileListButton_clicked()

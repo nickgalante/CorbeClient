@@ -32,6 +32,7 @@ public:
     void getUserFileList(QString user);
     void insertNewUser(QString email, QString firstName, QString lastName, QString department, QString superior, QString password);
     void removeUser(QString email);
+    void signout();
 
 public slots:
    void replyFinished(QNetworkReply*);
@@ -46,9 +47,11 @@ public slots:
    void downloadStatus(QString msg);
    void insertFinished(QNetworkReply* reply);
    void removeFinished(QNetworkReply* reply);
+   void signoutFinished(QNetworkReply* reply);
 
 signals:
    void loginSignal(QString msg);
+   void signoutSignal(QString msg);
    void progressSignal(qint64 read, qint64 total);
    void uploadProgressSignal(qint64 read, qint64 total);
    void getSubordiantesSignal(QString msg);

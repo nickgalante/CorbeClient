@@ -151,6 +151,35 @@ void ServerInterface::replyFinished(QNetworkReply *reply)
         }
 }
 
+void ServerInterface::signout(){
+    this->establishSslConfig();
+
+    QNetworkAccessManager *manager = new QNetworkAccessManager();
+
+        QUrl url("https://localhost:8443/signout");
+        QNetworkRequest request(url);
+        request.setSslConfiguration(*this->sslConfig);
+        request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
+
+        QByteArray postData;
+        postData.append("token=" + this->token);
+        qDebug() <<"token: " << this->token;
+
+        manager->post(request, postData);
+
+        connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(signoutFinished(QNetworkReply*)));
+}
+
+void ServerInterface::signoutFinished(QNetworkReply *reply)
+{
+    QString data = reply->readAll();
+        if(data.isNull() || data.isEmpty()){
+            throw "ServerInterface::replyFinished has received null or empty data.";
+        } else{
+
+            emit signoutSignal(data);
+        }
+}
 
 
 //void ServerInterface::sendFile(QString userid, QString filename, QString filelocation)

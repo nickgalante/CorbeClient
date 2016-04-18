@@ -25,12 +25,25 @@
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
+     <widget class="QLabel" name="welcomeLabel">
+      <property name="layoutDirection">
+       <enum>Qt::RightToLeft</enum>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="enabled">
        <bool>true</bool>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="login">
        <property name="styleSheet">
@@ -162,27 +175,6 @@ QFrame{
           <property name="currentIndex">
            <number>3</number>
           </property>
-          <widget class="QWidget" name="Dashboard">
-           <attribute name="title">
-            <string>Dashboard</string>
-           </attribute>
-           <widget class="QLabel" name="tabStatusLabel">
-            <property name="geometry">
-             <rect>
-              <x>150</x>
-              <y>30</y>
-              <width>211</width>
-              <height>71</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Login Status</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </widget>
           <widget class="QWidget" name="Encrypt">
            <attribute name="title">
             <string>Encrypt</string>
@@ -568,7 +560,7 @@ QTreeView::item:selected:!active {
      <x>0</x>
      <y>0</y>
      <width>550</width>
-     <height>27</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>

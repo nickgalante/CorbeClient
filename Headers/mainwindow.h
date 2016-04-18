@@ -27,6 +27,7 @@ public:
 
 private slots:
      void handleLogin();
+     void handleSignout(QString msg);
      //void replyFinished(QNetworkReply*);
      //void requestReceived(QNetworkReply*);
      void displayMessage(QString msg);
