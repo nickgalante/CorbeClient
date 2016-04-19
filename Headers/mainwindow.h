@@ -60,7 +60,7 @@ private slots:
 
      void on_deleteFileButton_clicked();
 
-     void displayDownloadStatus(QString status);
+     void redirectToLogin(QString status);
 
      void on_insertUserButton_clicked();
 

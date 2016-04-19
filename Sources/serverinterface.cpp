@@ -103,7 +103,7 @@ void ServerInterface::updateDownloadProgress(qint64 read, qint64 total)
 void ServerInterface::downloadStatus(QString msg){
     qDebug() <<"calling downloadStatus";
     qDebug() << "response" << msg;
-    emit downloadStatusSignal(msg);
+    emit invalidDownloadStatus(msg);
 
 }
 
@@ -172,12 +172,17 @@ void ServerInterface::signout(){
 
 void ServerInterface::signoutFinished(QNetworkReply *reply)
 {
+    QVariant statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
+    qDebug() << "status code: " << statusCode.toInt();
     QString data = reply->readAll();
         if(data.isNull() || data.isEmpty()){
             throw "ServerInterface::replyFinished has received null or empty data.";
-        } else{
+        } else if(statusCode == 200){
 
-            emit signoutSignal(data);
+            emit signoutSignal("Success");
+        }
+        else{
+            emit signoutSignal("Invalid Attempt");
         }
 }
 

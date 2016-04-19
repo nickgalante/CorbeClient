@@ -56,7 +56,7 @@ signals:
    void uploadProgressSignal(qint64 read, qint64 total);
    void getSubordiantesSignal(QString msg);
    void userFileListSignal(QString msg);
-   void downloadStatusSignal(QString msg);
+   void invalidDownloadStatus(QString msg);
 
 private:
    QString token;

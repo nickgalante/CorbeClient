@@ -43,7 +43,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this->si, SIGNAL(getSubordiantesSignal(QString)),this,SLOT(fillDropdown(QString)));
     connect(this->si, SIGNAL(loginSignal(QString)),this,SLOT(displayMessage(QString)));
     connect(this->si, SIGNAL(userFileListSignal(QString)),this,SLOT(fillFileList(QString)));
-    connect(this->si, SIGNAL(downloadStatusSignal(QString)),this,SLOT(displayDownloadStatus(QString)));
+    connect(this->si, SIGNAL(invalidDownloadStatus(QString)),this,SLOT(redirectToLogin(QString)));
     connect(this->si, SIGNAL(signoutSignal(QString)),this,SLOT(handleSignout(QString)));
 
 
@@ -100,8 +100,14 @@ void MainWindow::on_backToLogin_clicked()
 }
 
 void MainWindow::handleSignout(QString msg){
-    ui->statusLabel->setText("Logout Successful");
-    ui->welcomeLabel->setText("");
+    if(msg.contains("Success", Qt::CaseInsensitive )){
+        ui->statusLabel->setText("Logout Successful");
+        ui->welcomeLabel->setText("");
+    }
+    else{
+        ui->statusLabel->setText("Invalid Token, Session invalidated");
+        ui->welcomeLabel->setText("");
+    }
 
 }
 
@@ -162,12 +168,21 @@ void MainWindow::updateProgress(qint64 read){
     QString percent = QString::number(value);
     ui->downloadProgress->setValue(value);
     qDebug() << "percent" << percent;
-    ui->progressPrecent->setText(percent + "%");
+    if(value > 100){
+        ui->progressPrecent->setText("0%");
+    }
+    else{
+        ui->progressPrecent->setText(percent + "%");
+    }
 }
 
-void MainWindow::displayDownloadStatus(QString status){
+void MainWindow::redirectToLogin(QString status){
     qDebug() <<"setting downloadStatus text" << status;
-     ui->downloadStatus->setText(status);
+    ui->stackedWidget->setCurrentIndex(0);
+    ui->statusLabel->setText("Invalid Token, Session invalidated");
+    ui->welcomeLabel->setText("");
+
+
 }
 
 
@@ -210,6 +225,9 @@ void MainWindow::on_fileList_itemClicked(QTreeWidgetItem *item)
 
 void MainWindow::fillDropdown(QString msg){
     ui->userList->clear();
+    ui->userToRemove->clear();
+    ui->newUserSuperior->clear();
+
     ui->userList->addItem(si->getUserEmail());
     ui->newUserSuperior->addItem(si->getUserEmail());
     ui->userToRemove->addItem(si->getUserEmail());
@@ -222,10 +240,7 @@ void MainWindow::fillDropdown(QString msg){
         ui->userList->addItem(obj["email"].toString());
         ui->newUserSuperior->addItem(obj["email"].toString());
         ui->userToRemove->addItem(obj["email"].toString());
-        //ui->ListOfSubordinates->addItem(obj["email"].toString());
     }
-
-
 
 }
 void MainWindow::updateUploadProgress(qint64 read){

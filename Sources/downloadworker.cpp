@@ -37,12 +37,13 @@ void DownloadWorker::onHttpReadyRead(){
 
     QByteArray response = this->reply->readAll();
 
-   /* if
-    if(response.contains("invalid token", Qt::CaseInsensitive)){
+    QVariant statusCode = this->reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
+    qDebug() << "status code: " << statusCode.toInt();
+    if(statusCode != 200){
         qDebug() << "Invalid Token";
-        emit invalidTokenSignal(response);
+        emit invalidTokenSignal("Invalid");
     }
-    else*/ if (this->fileToWriteTo->isWritable()){
+    else if (this->fileToWriteTo->isWritable()){
         this->totalWrote += this->fileToWriteTo->write(response);
         this->fileToWriteTo->seek(this->totalWrote);
         this->fileToWriteTo->flush();
