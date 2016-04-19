@@ -86,7 +86,6 @@ bool ServerInterface::getFile(QString fileName, QString token) {
    t->start();
 
    connect(manager, SIGNAL(finished(QNetworkReply*)), dw, SLOT(downloadFinished(QNetworkReply*)));
-   //connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(downloadStatus(QNetworkReply*)));
    connect(dw, SIGNAL(invalidTokenSignal(QString)), this, SLOT(downloadStatus(QString)));
    connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(updateDownloadProgress(qint64, qint64)));
 
@@ -103,7 +102,7 @@ void ServerInterface::updateDownloadProgress(qint64 read, qint64 total)
 void ServerInterface::downloadStatus(QString msg){
     qDebug() <<"calling downloadStatus";
     qDebug() << "response" << msg;
-    emit invalidDownloadStatus(msg);
+    emit invalidStatusCodeSignal(msg);
 
 }
 
@@ -263,11 +262,13 @@ void ServerInterface::uploadReplyFinished()
 void ServerInterface::uploadFile(QString fileNameAndDirectory){
 
     //connect(this->reply, SIGNAL(uploadProgress(qint64, qint64)), this, SLOT(updateUploadProgress(qint64, qint64)));
-
     qDebug() << "ServerInterface::uploadFile(QString fileNameAndDirectory) fileNameAndDirectory: " << fileNameAndDirectory;
     qDebug() << "ServerInterface::uploadFile(QString fileNameAndDirectory) token: " << this->token;
     qDebug() << "ServerInterface::uploadFile(QString fileNameAndDirectory) making the upload worker";
     UploadWorker* uploadWorker = new UploadWorker(this->token, fileNameAndDirectory, this->sslConfig);
+
+    connect(uploadWorker, SIGNAL(invalidTokenSignal(QString)), this, SLOT(uploadStatus(QString)));
+
     QThread* t = new QThread();
     uploadWorker->moveToThread(t);
     uploadWorker->run();
@@ -280,6 +281,12 @@ void ServerInterface::updateUploadProgress(qint64 read, qint64 total)
 {
     qDebug()<< "upload" << read << total;
     emit uploadProgressSignal(read, total);
+}
+
+void ServerInterface::uploadStatus(QString msg){
+    qDebug() <<"calling uploadStatus";
+    qDebug() << "response" << msg;
+    emit invalidStatusCodeSignal(msg);
 }
 
 //disabled for now
@@ -311,13 +318,20 @@ void ServerInterface::getSubordiantes(){
 void ServerInterface::getSubordiantesFinished(QNetworkReply *reply)
 {
 
+    QVariant statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
+    qDebug() << "Get Subordiantes status code: " << statusCode.toInt();
     QString data = reply->readAll();
-    if(data.isNull() || data.isEmpty()){
-            throw "ServerInterface::replyFinished has received null or empty data.";
-        } else{
+        if(data.isNull() || data.isEmpty()){
+            throw "ServerInterface::getSubordiantesFinished has received null or empty data.";
+        } else if(statusCode == 200){
 
             emit getSubordiantesSignal(data);
+
         }
+        else{
+            emit invalidStatusCodeSignal("Invalid Token");
+        }
+
 }
 
 void ServerInterface::deleteFile(QString fileName, QString token){
@@ -341,7 +355,20 @@ void ServerInterface::deleteFile(QString fileName, QString token){
 
 void ServerInterface::deleteFinished(QNetworkReply *rep)
 {
-    qDebug() << "File Successfully Deleted";
+    QVariant statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
+    qDebug() << "Insert User status code: " << statusCode.toInt();
+    QString data = reply->readAll();
+        if(data.isNull() || data.isEmpty()){
+            throw "ServerInterface::deleteFinished has received null or empty data.";
+        } else if(statusCode == 200){
+            qDebug() << "File Successfully Deleted";
+
+        }
+        else{
+            emit invalidStatusCodeSignal("Invalid Token");
+        }
+
+
 }
 
 void ServerInterface::getUserFileList(QString user){
@@ -389,7 +416,20 @@ void ServerInterface::insertNewUser(QString email, QString firstName, QString la
 }
 
 void ServerInterface::insertFinished(QNetworkReply* reply){
-    qDebug() << "User inserted " << reply->readAll();
+
+    QVariant statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
+    qDebug() << "Insert User status code: " << statusCode.toInt();
+    QString data = reply->readAll();
+        if(data.isNull() || data.isEmpty()){
+            throw "ServerInterface::getSubordiantesFinished has received null or empty data.";
+        } else if(statusCode == 200){
+            qDebug() << "User inserted " << reply->readAll();
+
+        }
+        else{
+            emit invalidStatusCodeSignal("Invalid Token");
+        }
+
 }
 
 void ServerInterface::removeUser(QString email){
@@ -407,7 +447,21 @@ void ServerInterface::removeUser(QString email){
 }
 
 void ServerInterface::removeFinished(QNetworkReply* reply){
-    qDebug() << "User removed" << reply->readAll();
+
+    QVariant statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
+    qDebug() << "Get Subordiantes status code: " << statusCode.toInt();
+    QString data = reply->readAll();
+        if(data.isNull() || data.isEmpty()){
+            throw "ServerInterface::getSubordiantesFinished has received null or empty data.";
+        } else if(statusCode == 200){
+
+            qDebug() << "User removed" << reply->readAll();
+
+        }
+        else{
+            emit invalidStatusCodeSignal("Invalid Token");
+        }
+
 }
 
 void ServerInterface::establishSslConfig(){

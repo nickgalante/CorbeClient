@@ -22,6 +22,9 @@ public slots:
     void erroron_filesend(QNetworkReply*);
     void fileUploadProgress(qint64 bytesSent, qint64 bytesTotal);
 
+signals:
+    void invalidTokenSignal(QString msg);
+
 private:
     QString token;
     QString fileNameAndDirectory;

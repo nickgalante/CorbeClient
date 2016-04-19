@@ -43,8 +43,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this->si, SIGNAL(getSubordiantesSignal(QString)),this,SLOT(fillDropdown(QString)));
     connect(this->si, SIGNAL(loginSignal(QString)),this,SLOT(displayMessage(QString)));
     connect(this->si, SIGNAL(userFileListSignal(QString)),this,SLOT(fillFileList(QString)));
-    connect(this->si, SIGNAL(invalidDownloadStatus(QString)),this,SLOT(redirectToLogin(QString)));
     connect(this->si, SIGNAL(signoutSignal(QString)),this,SLOT(handleSignout(QString)));
+
+    connect(this->si, SIGNAL(invalidStatusCodeSignal(QString)), this, SLOT(redirectToLogin(QString)));
 
 
 
@@ -182,10 +183,7 @@ void MainWindow::redirectToLogin(QString status){
     ui->statusLabel->setText("Invalid Token, Session invalidated");
     ui->welcomeLabel->setText("");
 
-
 }
-
-
 
 
 void MainWindow::on_fileChooseButton_clicked()
@@ -276,3 +274,4 @@ void MainWindow::on_removeUserButton_clicked()
 
     si->removeUser(email);
 }
+

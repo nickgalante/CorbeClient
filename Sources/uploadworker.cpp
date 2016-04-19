@@ -57,9 +57,17 @@ void UploadWorker::run(){
 }
 
 
- void UploadWorker::erroron_filesend(QNetworkReply*){
+ void UploadWorker::erroron_filesend(QNetworkReply* reply){
+
      qDebug() << "Event fired due to finishing.";
      qDebug()<<"From child thread UploadWorker::erroron_filesend(QNetworkReply*): "<< QThread::currentThreadId();
+
+     QVariant statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
+     qDebug() << "status code: " << statusCode.toInt();
+     if(statusCode != 200){
+         qDebug() << "Invalid Token";
+         emit invalidTokenSignal("Invalid");
+     }
  }
 
  void UploadWorker::fileUploadProgress(qint64 bytesSent, qint64 bytesTotal){

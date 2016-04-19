@@ -45,6 +45,7 @@ public slots:
    void deleteFinished(QNetworkReply *rep);
    void userFileListResponse(QNetworkReply *reply);
    void downloadStatus(QString msg);
+   void uploadStatus(QString msg);
    void insertFinished(QNetworkReply* reply);
    void removeFinished(QNetworkReply* reply);
    void signoutFinished(QNetworkReply* reply);
@@ -57,6 +58,7 @@ signals:
    void getSubordiantesSignal(QString msg);
    void userFileListSignal(QString msg);
    void invalidDownloadStatus(QString msg);
+   void invalidStatusCodeSignal(QString msg);
 
 private:
    QString token;
