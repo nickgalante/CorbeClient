@@ -158,7 +158,7 @@ void MainWindow::doDownload(){
     qDebug() << "Getting file";
     ui->downloadProgress->setValue(0);
     connect(this->si, SIGNAL(progressSignal(qint64, qint64)), this, SLOT(updateProgress(qint64)));
-    si->getFile(ui->fileNameLineEdit->text(), this->si->getToken());
+    si->getFile(ui->fileNameLineEdit->text(), this->si->getToken(), ui->userList->currentText());
 
 
 }

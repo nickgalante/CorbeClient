@@ -18,7 +18,7 @@ public:
     explicit ServerInterface(QObject *parent = 0);
 
     bool getFile();
-    bool getFile(QString fileName, QString token);
+    bool getFile(QString fileName, QString token, QString lookupEmail);
     //void sendFile(QString userid, QString name, QString file_location);
     void sendFile(QString name);
     void uploadFile(QString fileNameAndDirectory); //the one we use

@@ -57,7 +57,7 @@ bool ServerInterface::getFile() {
    return true;
 }
 
-bool ServerInterface::getFile(QString fileName, QString token) {
+bool ServerInterface::getFile(QString fileName, QString token, QString lookupEmail) {
    //create the usual crap
    QNetworkAccessManager *manager = new QNetworkAccessManager();
    QNetworkRequest req(QUrl("https://localhost:8443/decrypt"));
@@ -73,6 +73,7 @@ bool ServerInterface::getFile(QString fileName, QString token) {
    QByteArray postData;
    postData.append("token=" + this->token + "&");
    postData.append("fileName=" + this->fileName);
+   postData.append("&lookupEmail=" + lookupEmail);
 
    this->reply = manager->post(req, postData);
    QThread *t = new QThread();
@@ -424,6 +425,7 @@ void ServerInterface::insertFinished(QNetworkReply* reply){
             throw "ServerInterface::getSubordiantesFinished has received null or empty data.";
         } else if(statusCode == 200){
             qDebug() << "User inserted " << reply->readAll();
+            getSubordiantes();
 
         }
         else{
@@ -456,6 +458,7 @@ void ServerInterface::removeFinished(QNetworkReply* reply){
         } else if(statusCode == 200){
 
             qDebug() << "User removed" << reply->readAll();
+            getSubordiantes();
 
         }
         else{
