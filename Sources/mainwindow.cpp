@@ -23,7 +23,6 @@
 #include <QTreeWidget>
 
 
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -56,6 +55,11 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+
+/**
+ * @brief MainWindow::handleLogin
+ * Calls the login fucntion in the serverInterface class
+ */
 void MainWindow::handleLogin(){
 
     if(! this->si->isServerContactable()){
@@ -69,6 +73,11 @@ void MainWindow::handleLogin(){
     }
 }
 
+/**
+ * If login is a success allow the user to view the rest of the application, otherwise prompt invalid login attempt
+ * @brief MainWindow::displayMessage
+ * @param msg Message that is returned after login
+ */
 void MainWindow::displayMessage(QString msg){
     if(msg.contains("success", Qt::CaseInsensitive)){
         ui->statusLabel->setText("Welcome");
@@ -92,6 +101,10 @@ void MainWindow::displayServerIsNotContactable(){
     ui->statusLabel->setText("Server is currently unreachable.");
 }
 
+/**
+ * Handles the signout function when the logout button is clicked
+ * @brief MainWindow::on_backToLogin_clicked
+ */
 void MainWindow::on_backToLogin_clicked()
 {
     if(ui->tabWidget->currentIndex()==3){
@@ -99,6 +112,7 @@ void MainWindow::on_backToLogin_clicked()
          si->signout();
     }
 }
+
 
 void MainWindow::handleSignout(QString msg){
     if(msg.contains("Success", Qt::CaseInsensitive )){
@@ -118,6 +132,11 @@ void MainWindow::on_getFileListButton_clicked()
     si->getUserFileList(ui->userList->currentText());
 }
 
+/**
+ * Populates the user file list after a sucessful getUSerFileList attempt
+ * @brief MainWindow::fillFileList
+ * @param msg
+ */
 void MainWindow::fillFileList(QString msg){
 
     ui->fileList->clear();
@@ -153,7 +172,10 @@ void MainWindow::on_downloadFileButton_clicked()
     doDownload();
 }
 
-
+/**
+ * Call the download file function in ServerInterface
+ * @brief MainWindow::doDownload
+ */
 void MainWindow::doDownload(){
     qDebug() << "Getting file";
     ui->downloadProgress->setValue(0);

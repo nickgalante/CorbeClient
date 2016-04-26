@@ -27,7 +27,11 @@ ServerInterface::ServerInterface(QObject *parent) : QObject(parent)
 
 }
 
-
+/**
+ * calls the serverController decrypt function and downloads a file, multithreaded for performance
+ * @brief ServerInterface::getFile
+ * @return
+ */
 bool ServerInterface::getFile() {
 
    //create the usual crap
@@ -57,6 +61,14 @@ bool ServerInterface::getFile() {
    return true;
 }
 
+/**
+ * Calls the ServerController decrypt function and downloads a specified User file, multithreaded for performanceoc
+ * @brief ServerInterface::getFile
+ * @param fileName Name of the file to download
+ * @param token User's unique session token
+ * @param lookupEmail Email of the file's owner
+ * @return
+ */
 bool ServerInterface::getFile(QString fileName, QString token, QString lookupEmail) {
    //create the usual crap
    QNetworkAccessManager *manager = new QNetworkAccessManager();
@@ -93,13 +105,23 @@ bool ServerInterface::getFile(QString fileName, QString token, QString lookupEma
    return true;
 }
 
-
+/**
+ * Update the download progress Bar
+ * @brief ServerInterface::updateDownloadProgress
+ * @param read
+ * @param total
+ */
 void ServerInterface::updateDownloadProgress(qint64 read, qint64 total)
 {
     qDebug() << read << total;
     emit progressSignal(read, total);
 }
 
+/**
+ * Returns the status of the download whether its a success or failure
+ * @brief ServerInterface::downloadStatus
+ * @param msg
+ */
 void ServerInterface::downloadStatus(QString msg){
     qDebug() <<"calling downloadStatus";
     qDebug() << "response" << msg;
@@ -109,8 +131,8 @@ void ServerInterface::downloadStatus(QString msg){
 
 /**
  * @brief ServerInterface::handleLogin Establishes ssl and handles login
- * @param email
- * @param password
+ * @param email User's entered email
+ * @param password User's entered password
  */
 void ServerInterface::handleLogin(QString email, QString password){
 
@@ -135,6 +157,11 @@ void ServerInterface::handleLogin(QString email, QString password){
 
 }
 
+/**
+ * Login Request Finished, Signals the mainWindow whether the login was a success or failure
+ * @brief ServerInterface::replyFinished
+ * @param reply
+ */
 void ServerInterface::replyFinished(QNetworkReply *reply)
 {
     QString data = reply->readAll();
@@ -151,6 +178,10 @@ void ServerInterface::replyFinished(QNetworkReply *reply)
         }
 }
 
+/**
+ * Calls the ServerCOntroller signout function invalidates a session token
+ * @brief ServerInterface::signout
+ */
 void ServerInterface::signout(){
     this->establishSslConfig();
 
@@ -170,6 +201,11 @@ void ServerInterface::signout(){
         connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(signoutFinished(QNetworkReply*)));
 }
 
+/**
+ * Signout request finished, retunrs success or failure
+ * @brief ServerInterface::signoutFinished
+ * @param reply
+ */
 void ServerInterface::signoutFinished(QNetworkReply *reply)
 {
     QVariant statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
@@ -188,6 +224,11 @@ void ServerInterface::signoutFinished(QNetworkReply *reply)
 
 
 //void ServerInterface::sendFile(QString userid, QString filename, QString filelocation)
+/**
+ * Upload a specified user file, calls the encrypt function
+ * @brief ServerInterface::sendFile
+ * @param filename Name of the file
+ */
 void ServerInterface::sendFile(QString filename){
 
     //connect(this->reply, SIGNAL(uploadProgress(qint64, qint64)), this, SLOT(updateUploadProgress(qint64, qint64)));
@@ -239,9 +280,18 @@ void ServerInterface::sendFile(QString filename){
     //ui->textBrowser->setText(in.readAll());
 }
 
+/**
+ * @brief ServerInterface::getToken
+ * @return The Current user's token
+ */
 QString ServerInterface::getToken(){
     return this->token;
 }
+
+/**
+ * @brief ServerInterface::getUserEmail
+ * @return  The current user's email
+ */
 QString ServerInterface::getUserEmail(){
     return this->userEmail;
 }
@@ -260,6 +310,11 @@ void ServerInterface::uploadReplyFinished()
 
 
 //MIGHT NEED TO STORE THE UPLOADWORKER* AS A GLOBAL/EXTERNAL VARIABLE
+/**
+ * Upload a specified file to the server, calls the encrypt function, Multithreaded for performance
+ * @brief ServerInterface::uploadFile
+ * @param fileNameAndDirectory Name of the file to upload
+ */
 void ServerInterface::uploadFile(QString fileNameAndDirectory){
 
     //connect(this->reply, SIGNAL(uploadProgress(qint64, qint64)), this, SLOT(updateUploadProgress(qint64, qint64)));
@@ -299,6 +354,10 @@ bool ServerInterface::isServerContactable(){
     return true;
 }
 
+/**
+ * Returns the Current user's subordinates
+ * @brief ServerInterface::getSubordiantes
+ */
 void ServerInterface::getSubordiantes(){
     QNetworkAccessManager *manager = new QNetworkAccessManager();
 
@@ -335,6 +394,12 @@ void ServerInterface::getSubordiantesFinished(QNetworkReply *reply)
 
 }
 
+/**
+ * Deletes a specified file.Calls the serverController Delete function
+ * @brief ServerInterface::deleteFile
+ * @param fileName Name of the file to delete
+ * @param token Current user's session token
+ */
 void ServerInterface::deleteFile(QString fileName, QString token){
     //create the usual crap
     QNetworkAccessManager *manager = new QNetworkAccessManager();
@@ -372,6 +437,11 @@ void ServerInterface::deleteFinished(QNetworkReply *rep)
 
 }
 
+/**
+ * Returns the File List of a specified user
+ * @brief ServerInterface::getUserFileList
+ * @param user Target user
+ */
 void ServerInterface::getUserFileList(QString user){
     qDebug() <<"User File List for: " << user;
     QNetworkAccessManager *manager = new QNetworkAccessManager(this);
@@ -397,6 +467,16 @@ void ServerInterface::userFileListResponse(QNetworkReply *reply){
         }
 }
 
+/**
+ * Insert a new user into the employee tree. Calls the serverController insertNewUser function
+ * @brief ServerInterface::insertNewUser
+ * @param email New email
+ * @param firstName New first Name
+ * @param lastName New Last name
+ * @param department User department
+ * @param superior user's superior email
+ * @param password User's given password
+ */
 void ServerInterface::insertNewUser(QString email, QString firstName, QString lastName, QString department, QString superior, QString password){
     QNetworkAccessManager *manager = new QNetworkAccessManager();
     QNetworkRequest req(QUrl("https://localhost:8443/insertNewUser"));
@@ -434,6 +514,11 @@ void ServerInterface::insertFinished(QNetworkReply* reply){
 
 }
 
+/**
+ * Remove a User from the employee tree. Calls the serverController remove function
+ * @brief ServerInterface::removeUser
+ * @param email email of user to remove
+ */
 void ServerInterface::removeUser(QString email){
     QNetworkAccessManager *manager = new QNetworkAccessManager();
     QNetworkRequest req(QUrl("https://localhost:8443/removeUser"));
@@ -467,6 +552,10 @@ void ServerInterface::removeFinished(QNetworkReply* reply){
 
 }
 
+/**
+ * Configure the ssl certificate
+ * @brief ServerInterface::establishSslConfig
+ */
 void ServerInterface::establishSslConfig(){
 
     QFile certLocation(":/ssl/Resources/CORBE_Cert_Distribute.der");
