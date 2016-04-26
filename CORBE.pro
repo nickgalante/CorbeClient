@@ -32,6 +32,9 @@ test {
     include(Forms/Forms.pri)
     include(Sources/Sources.pri)
     include(Headers/Headers.pri)
+} win32{
+    LIBS += -LC:/OpenSSL-Win32/lib -lubsec
+    INCLUDEPATH += C:/OpenSSL-Win32/include
 }
 
 RESOURCES += \
