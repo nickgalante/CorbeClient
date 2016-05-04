@@ -1,3 +1,6 @@
+/**
+@file
+*/
 #include "serverinterface.h"
 #include "mainwindow.h"
 #include "downloadworker.h"
@@ -27,7 +30,7 @@ ServerInterface::ServerInterface(QObject *parent) : QObject(parent)
 
 }
 
-/**
+/*!
  * calls the serverController decrypt function and downloads a file, multithreaded for performance
  * @brief ServerInterface::getFile
  * @return
@@ -324,6 +327,7 @@ void ServerInterface::uploadFile(QString fileNameAndDirectory){
     UploadWorker* uploadWorker = new UploadWorker(this->token, fileNameAndDirectory, this->sslConfig);
 
     connect(uploadWorker, SIGNAL(invalidTokenSignal(QString)), this, SLOT(uploadStatus(QString)));
+    connect(uploadWorker, SIGNAL(uploadSuccessSignal()), this, SLOT(updateUploadProgress()));
 
     QThread* t = new QThread();
     uploadWorker->moveToThread(t);
@@ -333,10 +337,10 @@ void ServerInterface::uploadFile(QString fileNameAndDirectory){
     qDebug() << "ServerInterface::uploadFile(QString fileNameAndDirectory) already started";
 }
 
-void ServerInterface::updateUploadProgress(qint64 read, qint64 total)
+void ServerInterface::updateUploadProgress()
 {
-    qDebug()<< "upload" << read << total;
-    emit uploadProgressSignal(read, total);
+    qDebug() << "emitting upload success from serverInterface";
+    emit uploadSuccess();
 }
 
 void ServerInterface::uploadStatus(QString msg){

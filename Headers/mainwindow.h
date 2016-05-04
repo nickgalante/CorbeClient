@@ -53,7 +53,7 @@ private slots:
 
      void fillDropdown(QString msg);
 
-     void updateUploadProgress(qint64);
+     void updateUploadProgress();
 
      void fillFileList(QString msg);
 

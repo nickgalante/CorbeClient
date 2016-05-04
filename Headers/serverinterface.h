@@ -39,7 +39,7 @@ public slots:
    void uploadReplyFinished(); //when the upload is complete do this
    //void downloadFinished(QNetworkReply*);
    void updateDownloadProgress(qint64 read, qint64 total);
-    void updateUploadProgress(qint64 read, qint64 total);
+    void updateUploadProgress();
    void getSubordiantesFinished(QNetworkReply*);
    //void httpReadyRead();
    void deleteFinished(QNetworkReply *rep);
@@ -59,6 +59,7 @@ signals:
    void userFileListSignal(QString msg);
    void invalidDownloadStatus(QString msg);
    void invalidStatusCodeSignal(QString msg);
+   void uploadSuccess();
 
 private:
    QString token;

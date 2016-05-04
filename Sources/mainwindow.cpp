@@ -45,6 +45,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this->si, SIGNAL(signoutSignal(QString)),this,SLOT(handleSignout(QString)));
 
     connect(this->si, SIGNAL(invalidStatusCodeSignal(QString)), this, SLOT(redirectToLogin(QString)));
+    connect(this->si, SIGNAL(uploadSuccess()), this, SLOT(updateUploadProgress()));
 
 
 
@@ -263,12 +264,17 @@ void MainWindow::fillDropdown(QString msg){
     }
 
 }
-void MainWindow::updateUploadProgress(qint64 read){
-    ui->uploadProgress->setMaximum(100);
-    qint64 value = (read/(si->fileSize.toDouble())*100);
-    QString percent = QString::number(value);
-    ui->uploadProgress->setValue(value);
-    qDebug() << "percent" << percent;
+void MainWindow::updateUploadProgress(){
+    //ui->uploadProgress->setMaximum(100);
+    //qint64 value = (read/(si->fileSize.toDouble())*100);
+    //QString percent = QString::number(value);
+    //ui->uploadProgress->setValue(value);
+    //qDebug() << "percent" << percent;
+    qDebug() << "creating dialog box";
+    QMessageBox::information(
+        this,
+        tr("Application Name"),
+        tr("Upload Success.") );
     //ui->progressPrecent->setText(percent + "%");
 }
 

@@ -68,6 +68,10 @@ void UploadWorker::run(){
          qDebug() << "Invalid Token";
          emit invalidTokenSignal("Invalid");
      }
+     else{
+         qDebug() << "emitting upload success from uploadWorker";
+         emit uploadSuccessSignal();
+     }
  }
 
  void UploadWorker::fileUploadProgress(qint64 bytesSent, qint64 bytesTotal){
